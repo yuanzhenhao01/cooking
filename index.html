@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小白做饭指南</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>小白做饭指南</h1>
+            <p class="subtitle">从零开始学做饭，一步一步跟着做</p>
+        </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索菜名、食材..." autocomplete="off">
+            <button id="searchBtn">搜索</button>
+        </div>
+    </header>
+
+    <nav class="category-nav">
+        <button class="cat-btn active" data-category="all">全部</button>
+        <button class="cat-btn" data-category="quick">快手菜</button>
+        <button class="cat-btn" data-category="meat">荤菜</button>
+        <button class="cat-btn" data-category="veg">素菜</button>
+        <button class="cat-btn" data-category="soup">汤粥</button>
+        <button class="cat-btn" data-category="staple">主食</button>
+        <button class="cat-btn" data-category="breakfast">早餐</button>
+        <button class="cat-btn" data-category="diet">减脂餐</button>
+        <button class="cat-btn" data-category="cold">凉菜</button>
+        <button class="cat-btn" data-category="rice">下饭菜</button>
+    </nav>
+
+    <main>
+        <section id="recipeList" class="recipe-grid"></section>
+        <section id="recipeDetail" class="recipe-detail hidden"></section>
+    </main>
+
+    <footer>
+        <p>小白做饭指南 — 让做饭变得简单</p>
+    </footer>
+
+    <script src="recipes.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
