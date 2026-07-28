@@ -162,12 +162,21 @@ async function generateAIPlan(userInfo) {
 
 // 对话调整方案
 async function chatWithAI(userMessage, currentPlanJSON) {
-    // 切换到对话模式的系统提示
-    if (chatHistory.length <= 2) {
-        chatHistory[0] = { role: "system", content: CHAT_SYSTEM_PROMPT + "\n\n当前方案：" + JSON.stringify(currentPlanJSON) };
+    // 如果还没有对话历史，初始化
+    if (chatHistory.length === 0) {
+        chatHistory = [
+            { role: "system", content: CHAT_SYSTEM_PROMPT }
+        ];
     }
+    // 确保系统提示是对话模式
+    chatHistory[0] = { role: "system", content: CHAT_SYSTEM_PROMPT };
 
     chatHistory.push({ role: "user", content: userMessage });
+
+    // 限制历史长度，避免token超限
+    if (chatHistory.length > 10) {
+        chatHistory = [chatHistory[0]].concat(chatHistory.slice(-8));
+    }
 
     const result = await callDeepSeek(chatHistory);
     chatHistory.push({ role: "assistant", content: result });
@@ -197,14 +206,19 @@ function parseAIResponse(text) {
         // 尝试从markdown代码块中提取
         const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
         if (jsonMatch) {
-            return JSON.parse(jsonMatch[1].trim());
+            try {
+                return JSON.parse(jsonMatch[1].trim());
+            } catch (e2) {}
         }
         // 尝试找到第一个 { 和最后一个 }
         const start = text.indexOf('{');
         const end = text.lastIndexOf('}');
-        if (start !== -1 && end !== -1) {
-            return JSON.parse(text.substring(start, end + 1));
+        if (start !== -1 && end !== -1 && end > start) {
+            try {
+                return JSON.parse(text.substring(start, end + 1));
+            } catch (e3) {}
         }
-        throw new Error("无法解析AI回复");
+        // 如果都解析不了，当作纯文字回复
+        return { type: "chat", message: text };
     }
 }
