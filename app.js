@@ -467,13 +467,15 @@ document.addEventListener("DOMContentLoaded", function () {
             removeChatLoading();
             if (result.type === "chat") {
                 appendChatMsg("ai", result.message);
-            } else if (result.meals) {
+            } else if (result.type === "plan" || result.meals) {
                 // AI返回了新方案
                 currentPlan = result;
-                appendChatMsg("ai", "方案已更新！页面内容已刷新。");
+                appendChatMsg("ai", "\u65b9\u6848\u5df2\u66f4\u65b0\uff01\u9875\u9762\u5185\u5bb9\u5df2\u5237\u65b0\u3002");
                 renderResult();
+            } else if (typeof result === "object" && result.message) {
+                appendChatMsg("ai", result.message);
             } else {
-                appendChatMsg("ai", "收到，但我暂时无法处理这个请求，请换个说法试试。");
+                appendChatMsg("ai", "\u6536\u5230\uff0c\u4f46\u6211\u6682\u65f6\u65e0\u6cd5\u5904\u7406\u8fd9\u4e2a\u8bf7\u6c42\uff0c\u8bf7\u6362\u4e2a\u8bf4\u6cd5\u8bd5\u8bd5\u3002");
             }
         }).catch(function (err) {
             removeChatLoading();
@@ -484,10 +486,14 @@ document.addEventListener("DOMContentLoaded", function () {
     function appendChatMsg(role, text, extraClass) {
         var container = document.getElementById("chatMessages");
         var cls = role === "user" ? "user-msg" : "ai-msg";
-        var avatar = role === "user" ? "我" : "AI";
+        var avatar = role === "user" ? "\u6211" : "AI";
+        // 简单格式化：换行 + markdown粗体
+        var formatted = text
+            .replace(/\n/g, "<br>")
+            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
         var div = document.createElement("div");
         div.className = "chat-msg " + cls + (extraClass ? " " + extraClass : "");
-        div.innerHTML = '<span class="chat-avatar">' + avatar + '</span><div class="chat-bubble">' + text + '</div>';
+        div.innerHTML = '<span class="chat-avatar">' + avatar + '</span><div class="chat-bubble">' + formatted + '</div>';
         container.appendChild(div);
         container.scrollTop = container.scrollHeight;
     }
