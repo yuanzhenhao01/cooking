@@ -487,8 +487,20 @@ document.addEventListener("DOMContentLoaded", function () {
         var container = document.getElementById("chatMessages");
         var cls = role === "user" ? "user-msg" : "ai-msg";
         var avatar = role === "user" ? "\u6211" : "AI";
-        // 简单格式化：换行 + markdown粗体
+        // 如果text还是JSON字符串，尝试提取message
+        if (typeof text === "string" && text.indexOf('"type"') !== -1 && text.indexOf('"message"') !== -1) {
+            try {
+                var obj = JSON.parse(text);
+                if (obj.message) text = obj.message;
+            } catch (e) {
+                // 尝试正则提取
+                var m = text.match(/"message"\s*:\s*"([\s\S]*?)"\s*\}?\s*$/);
+                if (m) text = m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+            }
+        }
+        // 简单格式化：换行 + markdown粗体 + emoji序号
         var formatted = text
+            .replace(/\\n/g, "\n")
             .replace(/\n/g, "<br>")
             .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
         var div = document.createElement("div");

@@ -217,26 +217,40 @@ async function identifyIngredients(description) {
 
 // 解析AI返回的JSON
 function parseAIResponse(text) {
+    // 去除可能的BOM和前后空白
+    text = text.trim().replace(/^\uFEFF/, '');
+
     try {
         // 尝试直接解析
-        return JSON.parse(text);
-    } catch (e) {
-        // 尝试从markdown代码块中提取
-        const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-        if (jsonMatch) {
-            try {
-                return JSON.parse(jsonMatch[1].trim());
-            } catch (e2) {}
-        }
-        // 尝试找到第一个 { 和最后一个 }
-        const start = text.indexOf('{');
-        const end = text.lastIndexOf('}');
-        if (start !== -1 && end !== -1 && end > start) {
-            try {
-                return JSON.parse(text.substring(start, end + 1));
-            } catch (e3) {}
-        }
-        // 如果都解析不了，当作纯文字回复
-        return { type: "chat", message: text };
+        var parsed = JSON.parse(text);
+        return parsed;
+    } catch (e) {}
+
+    // 尝试从markdown代码块中提取
+    var jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+        try {
+            return JSON.parse(jsonMatch[1].trim());
+        } catch (e2) {}
     }
+
+    // 尝试找到第一个 { 和最后一个 }（处理AI在JSON前后加了多余文字的情况）
+    var start = text.indexOf('{');
+    var end = text.lastIndexOf('}');
+    if (start !== -1 && end !== -1 && end > start) {
+        try {
+            return JSON.parse(text.substring(start, end + 1));
+        } catch (e3) {}
+    }
+
+    // 如果都解析不了，直接把原文当消息返回（去掉外层JSON壳如果有的话）
+    // 检查是否是未能解析的chat格式文本
+    var msgMatch = text.match(/"message"\s*:\s*"([\s\S]*?)"\s*\}?\s*$/);
+    if (msgMatch) {
+        // 还原转义
+        var msg = msgMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        return { type: "chat", message: msg };
+    }
+
+    return { type: "chat", message: text };
 }
