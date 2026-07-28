@@ -488,6 +488,27 @@ document.addEventListener("DOMContentLoaded", function () {
                             '<button class="timer-btn timer-btn-done" id="timerDone">\u8fd4\u56de\u65b9\u6848</button>';
                         document.getElementById("timerDone").addEventListener("click", function () {
                             showPage(pageResult);
+                        });
+                    }
+                }, 1000);
+            }
+        });
+
+        document.getElementById("timerReset").addEventListener("click", function () {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            timerRunning = false;
+            timerSeconds = timerTotalSeconds;
+            document.getElementById("timerTime").textContent = formatTime(timerSeconds);
+            document.getElementById("timerDisplay").className = "timer-display";
+            var startBtn = document.getElementById("timerStart");
+            if (startBtn) {
+                startBtn.textContent = "\u5f00\u59cb";
+                startBtn.className = "timer-btn timer-btn-start";
+            }
+        });
+    }
+
     // ========== 社交中心 ==========
     function showSocial() {
         var unlocked = AchievementSystem.getUnlocked();
@@ -585,26 +606,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("copyShareBtn").textContent = "\ud83d\udccb \u590d\u5236\u5206\u4eab\u6587\u6848";
                 }, 2000);
             });
-        });
-    }
-});
-                    }
-                }, 1000);
-            }
-        });
-
-        document.getElementById("timerReset").addEventListener("click", function () {
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = null;
-            timerRunning = false;
-            timerSeconds = timerTotalSeconds;
-            document.getElementById("timerTime").textContent = formatTime(timerSeconds);
-            document.getElementById("timerDisplay").className = "timer-display";
-            var startBtn = document.getElementById("timerStart");
-            if (startBtn) {
-                startBtn.textContent = "\u5f00\u59cb";
-                startBtn.className = "timer-btn timer-btn-start";
-            }
         });
     }
 
