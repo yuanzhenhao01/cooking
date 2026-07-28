@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const pageAuth = document.getElementById("pageAuth");
     const pageInput = document.getElementById("pageInput");
     const pageResult = document.getElementById("pageResult");
     const pageRecipe = document.getElementById("pageRecipe");
@@ -7,31 +8,86 @@ document.addEventListener("DOMContentLoaded", function () {
     const pageSocial = document.getElementById("pageSocial");
     const userForm = document.getElementById("userForm");
 
-    // 动态日期显示
-    function updateDate() {
-        var now = new Date();
-        var weekDays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-        var year = now.getFullYear();
-        var month = now.getMonth() + 1;
-        var day = now.getDate();
-        var weekDay = weekDays[now.getDay()];
-        var hours = now.getHours().toString().padStart(2, "0");
-        var minutes = now.getMinutes().toString().padStart(2, "0");
-
-        var greeting = "";
-        var h = now.getHours();
-        if (h < 6) greeting = "夜深了，注意休息";
-        else if (h < 9) greeting = "早安，新的一天从早餐开始";
-        else if (h < 11) greeting = "上午好，规划今日饮食";
-        else if (h < 13) greeting = "午餐时间到了";
-        else if (h < 17) greeting = "下午好，准备晚餐食材";
-        else if (h < 19) greeting = "晚餐时间，吃点好的";
-        else greeting = "晚上好，明天吃什么？";
-
-        document.getElementById("dateDisplay").innerHTML =
-            year + "年" + month + "月" + day + "日 " + weekDay + " " + hours + ":" + minutes +
-            '<span style="margin-left:1rem;opacity:0.85;">' + greeting + '</span>';
+    // 页面切换
+    function showPage(page) {
+        [pageAuth, pageInput, pageResult, pageRecipe, pageTimer, pageReport, pageSocial].forEach(function (p) {
+            p.classList.remove("active");
+        });
+        page.classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }
+
+    // ========== 登录/注册逻辑 ==========
+    function updateUserBar() {
+        var user = AuthSystem.getCurrentUser();
+        var bar = document.getElementById("userBar");
+        if (user) {
+            bar.innerHTML = '<span class="user-bar-info">' + user.avatar + ' ' + user.nickname + '</span><button class="user-bar-logout" id="logoutBtn">退出</button>';
+            bar.classList.add("visible");
+            document.getElementById("logoutBtn").addEventListener("click", function () {
+                AuthSystem.logout();
+                updateUserBar();
+                showPage(pageAuth);
+            });
+        } else {
+            bar.innerHTML = '<button class="user-bar-login" id="goLoginBtn">登录/注册</button>';
+            bar.classList.add("visible");
+            document.getElementById("goLoginBtn").addEventListener("click", function () {
+                showPage(pageAuth);
+            });
+        }
+    }
+
+    // 初始化：检查登录状态
+    updateUserBar();
+    if (AuthSystem.isLoggedIn()) {
+        showPage(pageInput);
+    } else {
+        showPage(pageAuth);
+    }
+
+    // 登录/注册 Tab 切换
+    document.querySelectorAll(".auth-tab").forEach(function (tab) {
+        tab.addEventListener("click", function () {
+            document.querySelectorAll(".auth-tab").forEach(function (t) { t.classList.remove("active"); });
+            this.classList.add("active");
+            var target = this.getAttribute("data-tab");
+            document.getElementById("loginForm").classList.toggle("hidden", target !== "login");
+            document.getElementById("registerForm").classList.toggle("hidden", target !== "register");
+        });
+    });
+
+    // 登录
+    document.getElementById("loginBtn").addEventListener("click", function () {
+        var username = document.getElementById("loginUsername").value.trim();
+        var password = document.getElementById("loginPassword").value;
+        var result = AuthSystem.login(username, password);
+        document.getElementById("loginMsg").textContent = result.msg;
+        document.getElementById("loginMsg").style.color = result.success ? "#52c41a" : "#ff4d4f";
+        if (result.success) {
+            updateUserBar();
+            showPage(pageInput);
+        }
+    });
+
+    // 注册
+    document.getElementById("registerBtn").addEventListener("click", function () {
+        var username = document.getElementById("regUsername").value.trim();
+        var nickname = document.getElementById("regNickname").value.trim();
+        var password = document.getElementById("regPassword").value;
+        var result = AuthSystem.register(username, password, nickname);
+        document.getElementById("regMsg").textContent = result.msg;
+        document.getElementById("regMsg").style.color = result.success ? "#52c41a" : "#ff4d4f";
+        if (result.success) {
+            updateUserBar();
+            showPage(pageInput);
+        }
+    });
+
+    // 跳过登录
+    document.getElementById("skipAuthBtn").addEventListener("click", function () {
+        showPage(pageInput);
+    });
     updateDate();
     setInterval(updateDate, 30000);
     const budgetSlider = document.getElementById("budget");
@@ -569,7 +625,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function showSocial() {
         var unlocked = AchievementSystem.getUnlocked();
         var nextGoals = AchievementSystem.getNextGoals();
-        var ranking = Leaderboard.getRanking();
+        var ranking = getMultiUserRanking();
         var shareData = ShareCard.generate();
         var stats = AchievementSystem.getStats();
 

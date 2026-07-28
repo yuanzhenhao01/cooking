@@ -1664,6 +1664,142 @@ footer {
     50% { opacity: 0.7; }
 }
 
+/* 用户栏 */
+.user-bar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 3;
+    display: none;
+}
+
+.user-bar.visible {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-bar-info {
+    font-size: 0.85rem;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+}
+
+.user-bar-logout, .user-bar-login {
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 15px;
+    background: transparent;
+    color: #fff;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.user-bar-logout:hover, .user-bar-login:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* 登录/注册页 */
+.auth-container {
+    max-width: 380px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 0.7rem;
+    border: none;
+    background: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.auth-tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+    font-weight: 600;
+}
+
+.auth-field {
+    margin-bottom: 1rem;
+}
+
+.auth-field input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.auth-field input:focus {
+    border-color: #667eea;
+}
+
+.auth-submit-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.auth-submit-btn:active {
+    transform: scale(0.98);
+}
+
+.auth-msg {
+    text-align: center;
+    font-size: 0.85rem;
+    margin-top: 0.8rem;
+    min-height: 1.2em;
+}
+
+.auth-skip {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.auth-skip-btn {
+    border: none;
+    background: none;
+    color: #888;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.auth-skip-btn:hover {
+    color: #667eea;
+}
+
 @media (max-width: 900px) {
     .result-body {
         grid-template-columns: 1fr;
