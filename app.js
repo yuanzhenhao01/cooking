@@ -468,10 +468,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (result.type === "chat") {
                 appendChatMsg("ai", result.message);
             } else if (result.type === "plan" || result.meals) {
-                // AI返回了新方案
+                // AI返回了新方案，先显示回复再更新
+                var reply = result.reply || "\u65b9\u6848\u5df2\u6839\u636e\u4f60\u7684\u8981\u6c42\u66f4\u65b0\uff01";
+                appendChatMsg("ai", reply);
                 currentPlan = result;
-                appendChatMsg("ai", "\u65b9\u6848\u5df2\u66f4\u65b0\uff01\u9875\u9762\u5185\u5bb9\u5df2\u5237\u65b0\u3002");
-                renderResult();
+                // 延迟一点更新页面，让用户先看到回复
+                setTimeout(function () { renderResult(); }, 500);
             } else if (typeof result === "object" && result.message) {
                 appendChatMsg("ai", result.message);
             } else {
