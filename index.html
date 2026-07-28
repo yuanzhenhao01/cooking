@@ -135,6 +135,13 @@
                 <button class="back-btn" id="backToInput">← 重新定制</button>
                 <h2>今日健康方案</h2>
                 <p class="ai-note">AI 已根据你的身体数据和目标生成个性化饮食+运动方案</p>
+                <div class="result-actions">
+                    <div class="weight-log-inline">
+                        <input type="number" id="weightLogInput" placeholder="今日体重(kg)" step="0.1">
+                        <button id="weightLogBtn" class="weight-log-btn">记录体重</button>
+                    </div>
+                    <button class="report-btn" id="showReportBtn">查看健康报告</button>
+                </div>
             </div>
 
             <div class="result-body">
@@ -215,10 +222,16 @@
         <section class="timer-container" id="timerContent"></section>
     </main>
 
+    <!-- 页面5：健康报告 -->
+    <main id="pageReport" class="page">
+        <section class="report-container" id="reportContent"></section>
+    </main>
+
     <footer>
         <p>每日fit — AI健康生活规划师，吃得对、练得好、活得精彩</p>
     </footer>
 
+    <script src="userdata.js"></script>
     <script src="mockdata.js"></script>
     <script src="ai.js"></script>
     <script src="app.js"></script>

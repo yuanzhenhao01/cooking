@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const pageResult = document.getElementById("pageResult");
     const pageRecipe = document.getElementById("pageRecipe");
     const pageTimer = document.getElementById("pageTimer");
+    const pageReport = document.getElementById("pageReport");
     const userForm = document.getElementById("userForm");
 
     // 动态日期显示
@@ -40,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 页面切换
     function showPage(page) {
-        [pageInput, pageResult, pageRecipe, pageTimer].forEach(function (p) {
+        [pageInput, pageResult, pageRecipe, pageTimer, pageReport].forEach(function (p) {
             p.classList.remove("active");
         });
         page.classList.add("active");
@@ -269,6 +270,11 @@ document.addEventListener("DOMContentLoaded", function () {
             btn.addEventListener("click", function () {
                 this.textContent = "\u5df2\u6253\u5361 \u2713";
                 this.classList.add("checked");
+                // 持久化打卡记录
+                var mealName = this.getAttribute("data-meal");
+                var exerciseId = this.getAttribute("data-exercise");
+                if (mealName) UserData.logCheckin("meal", mealName);
+                if (exerciseId) UserData.logCheckin("exercise", exerciseId);
             });
         });
 
@@ -278,7 +284,25 @@ document.addEventListener("DOMContentLoaded", function () {
             if (text) {
                 document.getElementById("feedbackSuccess").classList.remove("hidden");
                 document.getElementById("feedbackText").value = "";
+                UserData.logFeedback(text);
             }
+        });
+
+        // 体重记录
+        document.getElementById("weightLogBtn").addEventListener("click", function () {
+            var w = parseFloat(document.getElementById("weightLogInput").value);
+            if (w && w > 20 && w < 300) {
+                UserData.logWeight(w);
+                document.getElementById("weightLogInput").value = "";
+                this.textContent = "已记录 \u2713";
+                var self = this;
+                setTimeout(function () { self.textContent = "记录体重"; }, 2000);
+            }
+        });
+
+        // 查看报告按钮
+        document.getElementById("showReportBtn").addEventListener("click", function () {
+            showReport();
         });
 
         // AI对话发送
@@ -525,6 +549,110 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById("backToResult").addEventListener("click", function () {
             showPage(pageResult);
+        });
+    }
+
+    // ========== 健康报告 ==========
+    function showReport() {
+        var weekly = UserData.getWeeklyReport();
+        var monthly = UserData.getMonthlyReport();
+        var weightTrend = UserData.getWeightTrend();
+
+        var html = '<button class="back-btn" id="backFromReport">\u2190 \u8fd4\u56de\u65b9\u6848</button>' +
+            '<h2>\ud83d\udcca \u5065\u5eb7\u62a5\u544a</h2>' +
+            '<div class="report-tabs">' +
+            '<button class="report-tab active" data-tab="weekly">\u5468\u62a5</button>' +
+            '<button class="report-tab" data-tab="monthly">\u6708\u62a5</button>' +
+            '</div>';
+
+        // 周报
+        html += '<div class="report-panel" id="weeklyPanel">' +
+            '<h3>\ud83d\udcc5 \u672c\u5468\u6982\u89c8 <span style="font-size:0.8rem;color:#888;">(' + weekly.period + ')</span></h3>' +
+            '<div class="report-stats">' +
+            '<div class="stat-card"><div class="stat-value">' + weekly.daysTracked + '</div><div class="stat-label">\u6253\u5361\u5929\u6570</div></div>' +
+            '<div class="stat-card"><div class="stat-value">' + weekly.mealRate + '%</div><div class="stat-label">\u996e\u98df\u5b8c\u6210\u7387</div></div>' +
+            '<div class="stat-card"><div class="stat-value">' + weekly.exerciseRate + '%</div><div class="stat-label">\u8fd0\u52a8\u5b8c\u6210\u7387</div></div>' +
+            '<div class="stat-card"><div class="stat-value">' + (weekly.weightChange > 0 ? "+" : "") + weekly.weightChange + 'kg</div><div class="stat-label">\u4f53\u91cd\u53d8\u5316</div></div>' +
+            '</div>';
+
+        // 体重曲线（简易柱状图）
+        if (weekly.weights.length > 0) {
+            html += '<div class="chart-section"><h4>\u4f53\u91cd\u8d8b\u52bf</h4><div class="weight-chart">';
+            var maxW = Math.max.apply(null, weekly.weights.map(function (w) { return w.weight; }));
+            var minW = Math.min.apply(null, weekly.weights.map(function (w) { return w.weight; }));
+            var range = maxW - minW || 1;
+            weekly.weights.forEach(function (w) {
+                var pct = ((w.weight - minW) / range) * 60 + 30;
+                html += '<div class="weight-bar-wrap"><div class="weight-bar" style="height:' + pct + '%"></div><span class="weight-bar-label">' + w.weight + '</span><span class="weight-bar-date">' + w.date.slice(5) + '</span></div>';
+            });
+            html += '</div></div>';
+        }
+
+        // 打卡详情
+        html += '<div class="chart-section"><h4>\u6253\u5361\u660e\u7ec6</h4><div class="checkin-chart">';
+        if (weekly.daysTracked === 0) {
+            html += '<p style="color:#999;">\u672c\u5468\u8fd8\u6ca1\u6709\u6253\u5361\u8bb0\u5f55\uff0c\u5f00\u59cb\u6253\u5361\u5427\uff01</p>';
+        } else {
+            html += '<p>\ud83c\udf5a \u996e\u98df\u6253\u5361 ' + weekly.mealsCompleted + ' \u9910 / ' + (weekly.daysTracked * 3) + ' \u9910</p>';
+            html += '<div class="progress-bar"><div class="progress-fill" style="width:' + weekly.mealRate + '%"></div></div>';
+            html += '<p>\ud83c\udfcb\ufe0f \u8fd0\u52a8\u6253\u5361 ' + weekly.exerciseDays + ' \u5929 / ' + weekly.daysTracked + ' \u5929</p>';
+            html += '<div class="progress-bar"><div class="progress-fill progress-green" style="width:' + weekly.exerciseRate + '%"></div></div>';
+        }
+        html += '</div></div>';
+
+        html += '</div>'; // end weeklyPanel
+
+        // 月报
+        html += '<div class="report-panel hidden" id="monthlyPanel">' +
+            '<h3>\ud83d\udcc6 \u672c\u6708\u6982\u89c8 <span style="font-size:0.8rem;color:#888;">(' + monthly.period + ')</span></h3>' +
+            '<div class="report-stats">' +
+            '<div class="stat-card"><div class="stat-value">' + monthly.daysTracked + '</div><div class="stat-label">\u6253\u5361\u5929\u6570</div></div>' +
+            '<div class="stat-card"><div class="stat-value">' + monthly.mealRate + '%</div><div class="stat-label">\u996e\u98df\u5b8c\u6210\u7387</div></div>' +
+            '<div class="stat-card"><div class="stat-value">' + monthly.exerciseRate + '%</div><div class="stat-label">\u8fd0\u52a8\u5b8c\u6210\u7387</div></div>' +
+            '<div class="stat-card"><div class="stat-value">' + (monthly.weightChange > 0 ? "+" : "") + monthly.weightChange + 'kg</div><div class="stat-label">\u4f53\u91cd\u53d8\u5316</div></div>' +
+            '</div>';
+
+        if (monthly.weights.length > 0) {
+            html += '<div class="chart-section"><h4>\u4f53\u91cd\u8d8b\u52bf\uff0830\u5929\uff09</h4><div class="weight-chart">';
+            var maxM = Math.max.apply(null, monthly.weights.map(function (w) { return w.weight; }));
+            var minM = Math.min.apply(null, monthly.weights.map(function (w) { return w.weight; }));
+            var rangeM = maxM - minM || 1;
+            monthly.weights.forEach(function (w) {
+                var pct = ((w.weight - minM) / rangeM) * 60 + 30;
+                html += '<div class="weight-bar-wrap"><div class="weight-bar" style="height:' + pct + '%"></div><span class="weight-bar-label">' + w.weight + '</span><span class="weight-bar-date">' + w.date.slice(5) + '</span></div>';
+            });
+            html += '</div></div>';
+        }
+
+        html += '</div>'; // end monthlyPanel
+
+        // AI建议
+        var aiAdvice = "";
+        var rate = UserData.getCheckinRate(7);
+        if (rate.meal < 50) aiAdvice += "\u2022 \u996e\u98df\u6267\u884c\u7387\u504f\u4f4e\uff0c\u5efa\u8bae\u9009\u62e9\u66f4\u7b80\u5355\u5feb\u624b\u7684\u83dc\u8c31<br>";
+        if (rate.exercise < 30) aiAdvice += "\u2022 \u8fd0\u52a8\u5b8c\u6210\u7387\u4e0d\u8db3\uff0c\u5efa\u8bae\u964d\u4f4e\u8fd0\u52a8\u5f3a\u5ea6\u548c\u65f6\u957f<br>";
+        if (weightTrend.trend === "gaining" && weightTrend.change > 1) aiAdvice += "\u2022 \u4f53\u91cd\u6709\u4e0a\u5347\u8d8b\u52bf\uff0c\u5efa\u8bae\u9002\u5f53\u63a7\u5236\u70ed\u91cf\u6444\u5165<br>";
+        if (weightTrend.trend === "losing" && weightTrend.change < -2) aiAdvice += "\u2022 \u4f53\u91cd\u4e0b\u964d\u8f83\u5feb\uff0c\u6ce8\u610f\u4fdd\u8bc1\u57fa\u7840\u8425\u517b\u6444\u5165<br>";
+        if (!aiAdvice) aiAdvice = "\u2022 \u7ee7\u7eed\u4fdd\u6301\u5f53\u524d\u8282\u594f\uff0c\u4f60\u505a\u5f97\u5f88\u597d\uff01";
+
+        html += '<div class="ai-advice-section"><h4>\ud83e\udd16 AI \u5efa\u8bae</h4><p>' + aiAdvice + '</p></div>';
+
+        document.getElementById("reportContent").innerHTML = html;
+        showPage(pageReport);
+
+        // 绑定报告页事件
+        document.getElementById("backFromReport").addEventListener("click", function () {
+            showPage(pageResult);
+        });
+
+        document.querySelectorAll(".report-tab").forEach(function (tab) {
+            tab.addEventListener("click", function () {
+                document.querySelectorAll(".report-tab").forEach(function (t) { t.classList.remove("active"); });
+                this.classList.add("active");
+                var target = this.getAttribute("data-tab");
+                document.getElementById("weeklyPanel").classList.toggle("hidden", target !== "weekly");
+                document.getElementById("monthlyPanel").classList.toggle("hidden", target !== "monthly");
+            });
         });
     }
 });

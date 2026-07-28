@@ -1065,6 +1065,222 @@ footer {
     cursor: not-allowed;
 }
 
+/* 体重记录和报告入口 */
+.result-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.weight-log-inline {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.weight-log-inline input {
+    width: 110px;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.weight-log-btn {
+    padding: 0.4rem 0.8rem;
+    background: #667eea;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.report-btn {
+    padding: 0.4rem 1rem;
+    background: #ff6b35;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.report-btn:hover {
+    background: #e55a2b;
+}
+
+/* 健康报告页 */
+.report-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid #f0ece8;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.report-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.report-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.report-tab {
+    padding: 0.5rem 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.report-tab.active {
+    background: #667eea;
+    color: #fff;
+    border-color: #667eea;
+}
+
+.report-panel h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.report-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1rem 0.5rem;
+    background: #f8fafe;
+    border-radius: 10px;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 0.3rem;
+}
+
+.chart-section {
+    margin-bottom: 1.5rem;
+}
+
+.chart-section h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+    color: #555;
+}
+
+.weight-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 120px;
+    padding: 0.5rem 0;
+    overflow-x: auto;
+}
+
+.weight-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 36px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.weight-bar {
+    width: 20px;
+    background: linear-gradient(to top, #667eea, #764ba2);
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s;
+}
+
+.weight-bar-label {
+    font-size: 0.65rem;
+    color: #667eea;
+    margin-top: 0.2rem;
+    font-weight: 600;
+}
+
+.weight-bar-date {
+    font-size: 0.6rem;
+    color: #aaa;
+}
+
+.progress-bar {
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    margin: 0.3rem 0 1rem;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #667eea;
+    border-radius: 4px;
+    transition: width 0.5s;
+}
+
+.progress-fill.progress-green {
+    background: #4caf50;
+}
+
+.checkin-chart p {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+.ai-advice-section {
+    background: #f5f3ff;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.ai-advice-section h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.ai-advice-section p {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.8;
+}
+
+@media (max-width: 600px) {
+    .report-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .result-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
 @media (max-width: 900px) {
     .result-body {
         grid-template-columns: 1fr;

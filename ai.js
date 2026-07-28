@@ -134,6 +134,9 @@ async function callDeepSeek(messages) {
 
 // 生成初始方案
 async function generateAIPlan(userInfo) {
+    // 获取用户历史数据作为AI参考
+    var aiContext = UserData.getAIContext();
+
     const userMessage = `请为以下用户生成今日饮食+运动方案：
 - 年龄：${userInfo.age}岁
 - 身高：${userInfo.height}cm
@@ -146,7 +149,8 @@ async function generateAIPlan(userInfo) {
 - 每餐菜品数：早餐${userInfo.dishCounts.breakfast}道、午餐${userInfo.dishCounts.lunch}道、晚餐${userInfo.dishCounts.dinner}道
 - 现有食材：${userInfo.ingredients || '无特定食材，自由搭配'}
 
-请生成完整的JSON方案。`;
+${aiContext}
+请根据以上信息（包括用户历史数据）生成完整的JSON方案。如果用户执行率低，推荐更简单的菜和更轻松的运动。`;
 
     chatHistory = [
         { role: "system", content: SYSTEM_PROMPT },
