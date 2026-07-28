@@ -214,7 +214,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (getApiKey()) {
             btnText.classList.add("hidden");
             btnLoading.classList.remove("hidden");
+            startLoadingAnimation();
             generateAIPlan(userInfo).then(function (plan) {
+                stopLoadingAnimation();
                 btnText.classList.remove("hidden");
                 btnLoading.classList.add("hidden");
                 if (plan && plan.meals && Array.isArray(plan.meals)) {
@@ -222,20 +224,52 @@ document.addEventListener("DOMContentLoaded", function () {
                     renderResult();
                     showPage(pageResult);
                 } else {
-                    // AI返回格式不对，fallback本地
                     generatePlanLocal(userInfo);
                 }
             }).catch(function (err) {
+                stopLoadingAnimation();
                 btnText.classList.remove("hidden");
                 btnLoading.classList.add("hidden");
                 console.warn("AI生成失败，使用本地方案:", err);
                 generatePlanLocal(userInfo);
             });
         } else {
-            // 没有API Key，直接用本地
             generatePlanLocal(userInfo);
         }
     });
+
+    // 加载动画
+    var loadingInterval = null;
+    var loadingStep = 0;
+    var loadingSteps = [
+        "分析你的身体数据...",
+        "规划营养搭配...",
+        "挑选适合的菜品...",
+        "制定运动计划...",
+        "生成采购清单...",
+        "最终优化中..."
+    ];
+
+    function startLoadingAnimation() {
+        loadingStep = 0;
+        updateLoadingText();
+        loadingInterval = setInterval(function () {
+            loadingStep = (loadingStep + 1) % loadingSteps.length;
+            updateLoadingText();
+        }, 2000);
+    }
+
+    function stopLoadingAnimation() {
+        if (loadingInterval) {
+            clearInterval(loadingInterval);
+            loadingInterval = null;
+        }
+    }
+
+    function updateLoadingText() {
+        var el = document.querySelector(".loading-text");
+        if (el) el.textContent = loadingSteps[loadingStep];
+    }
 
     // 本地生成方案（即时）
     function generatePlanLocal(userInfo) {
