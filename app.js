@@ -214,17 +214,17 @@ document.addEventListener("DOMContentLoaded", function () {
         generatePlanLocal(userInfo);
 
         // 后台调用AI优化方案
-        btnText.textContent = "AI优化中...";
+        btnText.textContent = "AI\u4f18\u5316\u4e2d...";
         generateAIPlan(userInfo).then(function (plan) {
-            btnText.textContent = "AI 生成今日健康方案";
-            if (plan && plan.meals) {
+            btnText.textContent = "AI \u751f\u6210\u4eca\u65e5\u5065\u5eb7\u65b9\u6848";
+            if (plan && plan.meals && Array.isArray(plan.meals)) {
                 currentPlan = plan;
                 renderResult();
-                appendChatMsg("ai", "AI已优化你的方案，内容已更新！");
+                appendChatMsg("ai", "AI\u5df2\u4f18\u5316\u4f60\u7684\u65b9\u6848\uff0c\u5185\u5bb9\u5df2\u66f4\u65b0\uff01");
             }
         }).catch(function (err) {
-            btnText.textContent = "AI 生成今日健康方案";
-            console.warn("AI优化失败，保持本地方案:", err);
+            btnText.textContent = "AI \u751f\u6210\u4eca\u65e5\u5065\u5eb7\u65b9\u6848";
+            console.warn("AI\u4f18\u5316\u5931\u8d25\uff0c\u4fdd\u6301\u672c\u5730\u65b9\u6848:", err);
         });
     });
 
@@ -467,15 +467,17 @@ document.addEventListener("DOMContentLoaded", function () {
             removeChatLoading();
             if (result.type === "chat") {
                 appendChatMsg("ai", result.message);
-            } else if (result.type === "plan" || result.meals) {
-                // AI返回了新方案，先显示回复再更新
+            } else if ((result.type === "plan" || result.meals) && Array.isArray(result.meals)) {
+                // AI返回了有效的新方案，先显示回复再更新
                 var reply = result.reply || "\u65b9\u6848\u5df2\u6839\u636e\u4f60\u7684\u8981\u6c42\u66f4\u65b0\uff01";
                 appendChatMsg("ai", reply);
                 currentPlan = result;
-                // 延迟一点更新页面，让用户先看到回复
                 setTimeout(function () { renderResult(); }, 500);
             } else if (typeof result === "object" && result.message) {
                 appendChatMsg("ai", result.message);
+            } else if (typeof result === "object" && result.reply) {
+                // 有回复但方案格式不完整，只显示回复
+                appendChatMsg("ai", result.reply);
             } else {
                 appendChatMsg("ai", "\u6536\u5230\uff0c\u4f46\u6211\u6682\u65f6\u65e0\u6cd5\u5904\u7406\u8fd9\u4e2a\u8bf7\u6c42\uff0c\u8bf7\u6362\u4e2a\u8bf4\u6cd5\u8bd5\u8bd5\u3002");
             }
