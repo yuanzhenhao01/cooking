@@ -88,23 +88,40 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("skipAuthBtn").addEventListener("click", function () {
         showPage(pageInput);
     });
+    // 动态日期显示
+    function updateDate() {
+        var now = new Date();
+        var weekDays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        var day = now.getDate();
+        var weekDay = weekDays[now.getDay()];
+        var hours = now.getHours().toString().padStart(2, "0");
+        var minutes = now.getMinutes().toString().padStart(2, "0");
+
+        var greeting = "";
+        var h = now.getHours();
+        if (h < 6) greeting = "夜深了，注意休息";
+        else if (h < 9) greeting = "早安，新的一天从早餐开始";
+        else if (h < 11) greeting = "上午好，规划今日饮食";
+        else if (h < 13) greeting = "午餐时间到了";
+        else if (h < 17) greeting = "下午好，准备晚餐食材";
+        else if (h < 19) greeting = "晚餐时间，吃点好的";
+        else greeting = "晚上好，明天吃什么？";
+
+        document.getElementById("dateDisplay").innerHTML =
+            year + "年" + month + "月" + day + "日 " + weekDay + " " + hours + ":" + minutes +
+            '<span style="margin-left:1rem;opacity:0.85;">' + greeting + '</span>';
+    }
     updateDate();
     setInterval(updateDate, 30000);
+
     const budgetSlider = document.getElementById("budget");
     const budgetDisplay = document.getElementById("budgetDisplay");
 
     let currentGoal = "lose";
     let currentSpecial = "none";
     let currentPlan = null;
-
-    // 页面切换
-    function showPage(page) {
-        [pageInput, pageResult, pageRecipe, pageTimer, pageReport, pageSocial].forEach(function (p) {
-            p.classList.remove("active");
-        });
-        page.classList.add("active");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }
 
     // 预算滑块
     budgetSlider.addEventListener("input", function () {
