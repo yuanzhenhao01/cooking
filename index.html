@@ -3,44 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小白做饭指南</title>
+    <title>每日fit — AI健康生活规划师</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
+        <div class="header-overlay"></div>
         <div class="header-content">
-            <h1>小白做饭指南</h1>
-            <p class="subtitle">从零开始学做饭，一步一步跟着做</p>
-        </div>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="搜索菜名、食材..." autocomplete="off">
-            <button id="searchBtn">搜索</button>
+            <div class="date-display" id="dateDisplay"></div>
+            <h1>每日fit</h1>
+            <p class="subtitle">AI健康生活规划师 — 饮食+运动一站搞定</p>
         </div>
     </header>
 
-    <nav class="category-nav">
-        <button class="cat-btn active" data-category="all">全部</button>
-        <button class="cat-btn" data-category="quick">快手菜</button>
-        <button class="cat-btn" data-category="meat">荤菜</button>
-        <button class="cat-btn" data-category="veg">素菜</button>
-        <button class="cat-btn" data-category="soup">汤粥</button>
-        <button class="cat-btn" data-category="staple">主食</button>
-        <button class="cat-btn" data-category="breakfast">早餐</button>
-        <button class="cat-btn" data-category="diet">减脂餐</button>
-        <button class="cat-btn" data-category="cold">凉菜</button>
-        <button class="cat-btn" data-category="rice">下饭菜</button>
-    </nav>
+    <!-- 页面1：用户信息输入 -->
+    <main id="pageInput" class="page active">
+        <section class="form-container">
+            <h2>告诉我你的需求，AI帮你规划饮食和运动</h2>
+            <form id="userForm">
+                <div class="form-group">
+                    <label>身体信息</label>
+                    <div class="form-row">
+                        <div class="input-item">
+                            <span class="input-label">年龄</span>
+                            <input type="number" id="age" placeholder="25" value="25">
+                        </div>
+                        <div class="input-item">
+                            <span class="input-label">身高(cm)</span>
+                            <input type="number" id="height" placeholder="175" value="175">
+                        </div>
+                        <div class="input-item">
+                            <span class="input-label">体重(kg)</span>
+                            <input type="number" id="weight" placeholder="65" value="65">
+                        </div>
+                        <div class="input-item">
+                            <span class="input-label">性别</span>
+                            <select id="gender">
+                                <option value="male">男</option>
+                                <option value="female">女</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-    <main>
-        <section id="recipeList" class="recipe-grid"></section>
-        <section id="recipeDetail" class="recipe-detail hidden"></section>
+                <div class="form-group">
+                    <label>饮食目标</label>
+                    <div class="goal-options">
+                        <button type="button" class="goal-btn active" data-goal="lose">减脂瘦身</button>
+                        <button type="button" class="goal-btn" data-goal="maintain">维持体重</button>
+                        <button type="button" class="goal-btn" data-goal="gain">增肌增重</button>
+                        <button type="button" class="goal-btn" data-goal="health">均衡健康</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>口味偏好</label>
+                    <div class="taste-options">
+                        <button type="button" class="taste-btn" data-taste="light">清淡</button>
+                        <button type="button" class="taste-btn active" data-taste="homestyle">家常</button>
+                        <button type="button" class="taste-btn" data-taste="spicy">偏辣</button>
+                        <button type="button" class="taste-btn" data-taste="sweet">偏甜</button>
+                        <button type="button" class="taste-btn" data-taste="sour">偏酸</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>忌口/过敏</label>
+                    <input type="text" id="allergy" placeholder="例如：不吃香菜、海鲜过敏、乳糖不耐受...">
+                </div>
+
+                <div class="form-group">
+                    <label>每日餐饮预算（元）</label>
+                    <div class="budget-slider">
+                        <input type="range" id="budget" min="20" max="150" value="50" step="10">
+                        <span id="budgetDisplay">50元/天</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>每餐菜品数量</label>
+                    <div class="form-row">
+                        <div class="input-item">
+                            <span class="input-label">早餐</span>
+                            <select id="breakfastCount">
+                                <option value="1">1道</option>
+                                <option value="2" selected>2道</option>
+                                <option value="3">3道</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <span class="input-label">午餐</span>
+                            <select id="lunchCount">
+                                <option value="2">2道</option>
+                                <option value="3" selected>3道</option>
+                                <option value="4">4道</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <span class="input-label">晚餐</span>
+                            <select id="dinnerCount">
+                                <option value="2">2道</option>
+                                <option value="3" selected>3道</option>
+                                <option value="4">4道</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>现有食材（可选）</label>
+                    <textarea id="ingredients" placeholder="例如：鸡蛋、西红柿、米饭、鸡胸肉...&#10;留空则AI自由搭配"></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="generateBtn">
+                    <span class="btn-text">AI 生成今日健康方案</span>
+                    <span class="btn-loading hidden">AI 正在规划中...</span>
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <!-- 页面2：AI生成结果 -->
+    <main id="pageResult" class="page">
+        <section class="result-container">
+            <div class="result-header">
+                <button class="back-btn" id="backToInput">← 重新定制</button>
+                <h2>今日健康方案</h2>
+                <p class="ai-note">AI 已根据你的身体数据和目标生成个性化饮食+运动方案</p>
+            </div>
+
+            <!-- 营养概览 -->
+            <div class="nutrition-overview" id="nutritionOverview"></div>
+
+            <!-- 三餐方案 -->
+            <div class="meals-plan" id="mealsPlan"></div>
+
+            <!-- 运动计划 -->
+            <div class="exercise-section">
+                <h3 class="section-title">今日运动计划</h3>
+                <div id="exercisePlan"></div>
+            </div>
+
+            <!-- 采购清单 -->
+            <div class="shopping-list-section">
+                <h3 class="section-title">今日采购清单</h3>
+                <div id="shoppingList"></div>
+            </div>
+
+            <!-- 饮食打卡 -->
+            <div class="checkin-section">
+                <h3 class="section-title">饮食打卡</h3>
+                <div id="checkinArea"></div>
+            </div>
+
+            <!-- 运动打卡 -->
+            <div class="checkin-section">
+                <h3 class="section-title">运动打卡</h3>
+                <div id="exerciseCheckin"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页面3：菜谱详情 -->
+    <main id="pageRecipe" class="page">
+        <section class="recipe-detail-container" id="recipeDetailContent"></section>
+    </main>
+
+    <!-- 页面4：运动计时器 -->
+    <main id="pageTimer" class="page">
+        <section class="timer-container" id="timerContent"></section>
     </main>
 
     <footer>
-        <p>小白做饭指南 — 让做饭变得简单</p>
+        <p>每日fit — AI健康生活规划师，吃得对、练得好、活得精彩</p>
     </footer>
 
-    <script src="recipes.js"></script>
+    <script src="mockdata.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

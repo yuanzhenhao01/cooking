@@ -6,75 +6,150 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: #faf8f5;
+    background: #f8fafe;
     color: #333;
     line-height: 1.6;
+    min-height: 100vh;
 }
 
 header {
-    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    background: linear-gradient(135deg, #1a7f5a, #2196f3, #00bcd4);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
     color: white;
-    padding: 2rem 1rem 1.5rem;
+    padding: 2.5rem 1rem;
     text-align: center;
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.header-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+}
+
+.header-content {
+    position: relative;
+    z-index: 2;
+}
+
+.date-display {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.6rem;
+    letter-spacing: 1px;
 }
 
 .header-content h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
     margin-bottom: 0.3rem;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .subtitle {
-    font-size: 0.95rem;
-    opacity: 0.9;
-}
-
-.search-box {
-    margin-top: 1.2rem;
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.search-box input {
-    flex: 1;
-    padding: 0.7rem 1rem;
-    border: none;
-    border-radius: 25px;
     font-size: 1rem;
-    outline: none;
+    opacity: 0.9;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
-.search-box button {
-    padding: 0.7rem 1.5rem;
-    border: none;
-    border-radius: 25px;
-    background: #fff;
-    color: #ff6b35;
-    font-weight: bold;
-    cursor: pointer;
+/* 页面切换 */
+.page {
+    display: none;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+.page.active {
+    display: block;
+}
+
+/* 表单容器 */
+.form-container h2 {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+    font-weight: normal;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group > label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: #444;
     font-size: 0.95rem;
-    transition: background 0.2s;
 }
 
-.search-box button:hover {
-    background: #fff3ed;
-}
-
-.category-nav {
+.form-row {
     display: flex;
-    gap: 0.5rem;
-    padding: 1rem;
-    overflow-x: auto;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-    justify-content: center;
+    gap: 1rem;
     flex-wrap: wrap;
 }
 
-.cat-btn {
+.input-item {
+    flex: 1;
+    min-width: 100px;
+}
+
+.input-item .input-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 0.3rem;
+}
+
+.form-group input[type="number"],
+.form-group input[type="text"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #667eea;
+}
+
+.form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* 目标/口味按钮组 */
+.goal-options,
+.taste-options {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.goal-btn,
+.taste-btn {
     padding: 0.5rem 1.2rem;
     border: 1px solid #ddd;
     border-radius: 20px;
@@ -82,157 +157,418 @@ header {
     cursor: pointer;
     font-size: 0.9rem;
     transition: all 0.2s;
-    white-space: nowrap;
 }
 
-.cat-btn:hover {
-    border-color: #ff6b35;
-    color: #ff6b35;
+.goal-btn:hover,
+.taste-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
 }
 
-.cat-btn.active {
-    background: #ff6b35;
+.goal-btn.active,
+.taste-btn.active {
+    background: #667eea;
     color: #fff;
-    border-color: #ff6b35;
+    border-color: #667eea;
 }
 
-main {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem;
-}
-
-.recipe-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.2rem;
-}
-
-.recipe-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 1.2rem;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid #f0ece8;
-}
-
-.recipe-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
-
-.recipe-card .emoji {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.recipe-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.4rem;
-    color: #222;
-}
-
-.recipe-card .meta {
-    font-size: 0.85rem;
-    color: #888;
+/* 预算滑块 */
+.budget-slider {
     display: flex;
+    align-items: center;
     gap: 1rem;
 }
 
-.recipe-card .tags {
-    margin-top: 0.6rem;
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
+.budget-slider input[type="range"] {
+    flex: 1;
+    height: 6px;
+    appearance: none;
+    background: #e0e0e0;
+    border-radius: 3px;
+    outline: none;
 }
 
-.recipe-card .tag {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 10px;
-    background: #fff3ed;
-    color: #e65c00;
+.budget-slider input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
 }
 
-.recipe-detail {
-    background: #fff;
+#budgetDisplay {
+    font-weight: 600;
+    color: #667eea;
+    min-width: 70px;
+}
+
+/* 提交按钮 */
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
     border-radius: 12px;
-    padding: 2rem;
-    border: 1px solid #f0ece8;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 1rem;
 }
 
-.recipe-detail.hidden {
-    display: none;
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.btn-loading {
+    display: inline-block;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 结果页 */
+.result-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.result-header h2 {
+    font-size: 1.5rem;
+    margin: 0.5rem 0;
+}
+
+.ai-note {
+    color: #888;
+    font-size: 0.9rem;
 }
 
 .back-btn {
     display: inline-block;
-    margin-bottom: 1.5rem;
     padding: 0.5rem 1rem;
-    background: #f5f5f5;
+    background: #f0f0f0;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.9rem;
     color: #555;
     transition: background 0.2s;
-}
-
-.back-btn:hover {
-    background: #eee;
-}
-
-.detail-header {
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 1rem;
-}
-
-.detail-header h2 {
-    font-size: 1.6rem;
     margin-bottom: 0.5rem;
 }
 
-.detail-header .detail-meta {
+.back-btn:hover {
+    background: #e0e0e0;
+}
+
+/* 营养概览 */
+.nutrition-overview {
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    border: 1px solid #667eea30;
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.nutrition-title {
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    color: #555;
+}
+
+.nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+}
+
+.nutrition-item {
+    text-align: center;
+}
+
+.nutrition-item .value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.nutrition-item .label {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 0.2rem;
+}
+
+/* 三餐卡片 */
+.meals-plan {
+    margin-bottom: 1.5rem;
+}
+
+.meal-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    border: 1px solid #f0ece8;
+    transition: box-shadow 0.2s;
+}
+
+.meal-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.meal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.meal-header h3 {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.meal-header .meal-cal {
+    font-size: 0.85rem;
+    color: #888;
+    background: #f5f5f5;
+    padding: 0.2rem 0.8rem;
+    border-radius: 10px;
+}
+
+.meal-dishes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.dish-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.8rem;
+    background: #fafafa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dish-item:hover {
+    background: #f0edff;
+}
+
+.dish-name {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dish-arrow {
+    color: #bbb;
+    font-size: 0.9rem;
+}
+
+/* 采购清单 */
+.section-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-left: 0.6rem;
+    border-left: 3px solid #667eea;
+}
+
+.shopping-list-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #f0ece8;
+}
+
+.shopping-category {
+    margin-bottom: 1rem;
+}
+
+.shopping-category h4 {
+    font-size: 0.9rem;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+}
+
+.shopping-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.shopping-item {
+    padding: 0.3rem 0.8rem;
+    background: #f5f3ff;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+/* 打卡区域 */
+.checkin-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #f0ece8;
+}
+
+.checkin-meals {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.checkin-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem;
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+.checkin-item .meal-name {
+    font-weight: 500;
+}
+
+.checkin-btn {
+    padding: 0.4rem 1rem;
+    border: 1px solid #667eea;
+    border-radius: 20px;
+    background: #fff;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.checkin-btn:hover {
+    background: #667eea;
+    color: #fff;
+}
+
+.checkin-btn.checked {
+    background: #52c41a;
+    border-color: #52c41a;
+    color: #fff;
+    cursor: default;
+}
+
+.feedback-area {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.feedback-area textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 0.7rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    resize: vertical;
+    outline: none;
+}
+
+.feedback-area textarea:focus {
+    border-color: #667eea;
+}
+
+.feedback-btn {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1.2rem;
+    background: #667eea;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.feedback-btn:hover {
+    background: #5a6fd6;
+}
+
+.feedback-success {
+    color: #52c41a;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* 菜谱详情页 */
+.recipe-detail-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #f0ece8;
+}
+
+.recipe-detail-container .back-btn {
+    margin-bottom: 1rem;
+}
+
+.recipe-detail-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.recipe-meta {
     font-size: 0.9rem;
     color: #888;
+    margin-bottom: 1.5rem;
     display: flex;
     gap: 1.5rem;
     flex-wrap: wrap;
 }
 
-.detail-section {
+.recipe-section {
     margin-bottom: 1.5rem;
 }
 
-.detail-section h3 {
-    font-size: 1.1rem;
+.recipe-section h3 {
+    font-size: 1.05rem;
     margin-bottom: 0.8rem;
-    color: #ff6b35;
-    border-left: 3px solid #ff6b35;
+    color: #667eea;
+    border-left: 3px solid #667eea;
     padding-left: 0.6rem;
 }
 
-.ingredients-list {
+.recipe-ingredients {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.4rem;
     list-style: none;
 }
 
-.ingredients-list li {
+.recipe-ingredients li {
     padding: 0.4rem 0;
     border-bottom: 1px dashed #f0f0f0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
-.steps-list {
+.recipe-steps {
     list-style: none;
     counter-reset: step;
 }
 
-.steps-list li {
+.recipe-steps li {
     counter-increment: step;
     padding: 0.8rem 0 0.8rem 2.5rem;
     position: relative;
@@ -241,46 +577,55 @@ main {
     line-height: 1.7;
 }
 
-.steps-list li::before {
+.recipe-steps li::before {
     content: counter(step);
     position: absolute;
     left: 0;
     top: 0.8rem;
     width: 1.8rem;
     height: 1.8rem;
-    background: #ff6b35;
+    background: #667eea;
     color: #fff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: bold;
 }
 
-.tips-box {
+.recipe-tips {
     background: #fffbf0;
     border: 1px solid #ffe0b2;
     border-radius: 8px;
     padding: 1rem;
 }
 
-.tips-box ul {
+.recipe-tips ul {
     list-style: disc;
     padding-left: 1.2rem;
 }
 
-.tips-box li {
+.recipe-tips li {
     margin-bottom: 0.4rem;
     font-size: 0.9rem;
     color: #666;
 }
 
-.no-result {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: #999;
-    font-size: 1.1rem;
+.nutrition-bar {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: #f5f3ff;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #555;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.nutrition-bar span {
+    font-weight: 500;
 }
 
 footer {
@@ -290,14 +635,247 @@ footer {
     font-size: 0.85rem;
 }
 
+/* 运动计划模块 */
+.exercise-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #f0ece8;
+}
+
+.exercise-overview {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    border: 1px solid #c8e6c9;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.exercise-overview-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+}
+
+.exercise-focus {
+    background: #4caf50;
+    color: #fff;
+    padding: 0.2rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.exercise-time {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.exercise-cal {
+    font-size: 0.85rem;
+    color: #e65100;
+    font-weight: 500;
+}
+
+.exercise-note {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.exercise-group {
+    margin-bottom: 1rem;
+}
+
+.exercise-group h4 {
+    font-size: 0.95rem;
+    color: #4caf50;
+    margin-bottom: 0.6rem;
+    padding-left: 0.5rem;
+    border-left: 3px solid #4caf50;
+}
+
+.exercise-item {
+    background: #fafafa;
+    border-radius: 8px;
+    padding: 0.8rem;
+    margin-bottom: 0.6rem;
+}
+
+.exercise-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.exercise-item-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.exercise-item-meta {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.exercise-item-desc {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.4rem;
+    line-height: 1.5;
+}
+
+.exercise-item {
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.exercise-item:hover {
+    background: #e8f5e9;
+    transform: translateX(3px);
+}
+
+.exercise-item-start-hint {
+    font-size: 0.75rem;
+    color: #4caf50;
+    margin-top: 0.3rem;
+    opacity: 0.8;
+}
+
+/* 计时器页面 */
+.timer-container {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid #f0ece8;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.timer-container .back-btn {
+    margin-bottom: 1.5rem;
+    display: inline-block;
+}
+
+.timer-exercise-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.timer-exercise-desc {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.timer-display {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 6px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    position: relative;
+}
+
+.timer-display.running {
+    border-color: #4caf50;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+.timer-display.paused {
+    border-color: #ff9800;
+}
+
+.timer-display.done {
+    border-color: #52c41a;
+    background: #f6ffed;
+}
+
+.timer-time {
+    font-size: 2.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #333;
+}
+
+.timer-display.done .timer-time {
+    font-size: 1.5rem;
+    color: #52c41a;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.timer-btn {
+    padding: 0.7rem 2rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.timer-btn:active {
+    transform: scale(0.95);
+}
+
+.timer-btn-start {
+    background: #4caf50;
+    color: #fff;
+}
+
+.timer-btn-start:hover {
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.timer-btn-pause {
+    background: #ff9800;
+    color: #fff;
+}
+
+.timer-btn-reset {
+    background: #f5f5f5;
+    color: #555;
+}
+
+.timer-btn-done {
+    background: #667eea;
+    color: #fff;
+}
+
+.timer-progress-text {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 0.5rem;
+}
+
 @media (max-width: 600px) {
     .header-content h1 {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
     }
-    .recipe-grid {
-        grid-template-columns: 1fr;
+    .nutrition-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
-    .category-nav {
-        justify-content: flex-start;
+    .form-row {
+        flex-direction: column;
+    }
+    .exercise-item-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
