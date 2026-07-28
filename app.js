@@ -210,22 +210,31 @@ document.addEventListener("DOMContentLoaded", function () {
             ingredients: document.getElementById("ingredients").value
         };
 
-        // 先用本地数据秒出方案
-        generatePlanLocal(userInfo);
-
-        // 后台调用AI优化方案
-        btnText.textContent = "AI\u4f18\u5316\u4e2d...";
-        generateAIPlan(userInfo).then(function (plan) {
-            btnText.textContent = "AI \u751f\u6210\u4eca\u65e5\u5065\u5eb7\u65b9\u6848";
-            if (plan && plan.meals && Array.isArray(plan.meals)) {
-                currentPlan = plan;
-                renderResult();
-                appendChatMsg("ai", "AI\u5df2\u4f18\u5316\u4f60\u7684\u65b9\u6848\uff0c\u5185\u5bb9\u5df2\u66f4\u65b0\uff01");
-            }
-        }).catch(function (err) {
-            btnText.textContent = "AI \u751f\u6210\u4eca\u65e5\u5065\u5eb7\u65b9\u6848";
-            console.warn("AI\u4f18\u5316\u5931\u8d25\uff0c\u4fdd\u6301\u672c\u5730\u65b9\u6848:", err);
-        });
+        // 如果有API Key，直接用AI生成；否则用本地
+        if (getApiKey()) {
+            btnText.classList.add("hidden");
+            btnLoading.classList.remove("hidden");
+            generateAIPlan(userInfo).then(function (plan) {
+                btnText.classList.remove("hidden");
+                btnLoading.classList.add("hidden");
+                if (plan && plan.meals && Array.isArray(plan.meals)) {
+                    currentPlan = plan;
+                    renderResult();
+                    showPage(pageResult);
+                } else {
+                    // AI返回格式不对，fallback本地
+                    generatePlanLocal(userInfo);
+                }
+            }).catch(function (err) {
+                btnText.classList.remove("hidden");
+                btnLoading.classList.add("hidden");
+                console.warn("AI生成失败，使用本地方案:", err);
+                generatePlanLocal(userInfo);
+            });
+        } else {
+            // 没有API Key，直接用本地
+            generatePlanLocal(userInfo);
+        }
     });
 
     // 本地生成方案（即时）
