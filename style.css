@@ -1114,6 +1114,21 @@ footer {
     background: #e55a2b;
 }
 
+.social-btn {
+    padding: 0.4rem 1rem;
+    background: #9c27b0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.social-btn:hover {
+    background: #7b1fa2;
+}
+
 /* 健康报告页 */
 .report-container {
     background: #fff;
@@ -1279,6 +1294,219 @@ footer {
         flex-direction: column;
         align-items: flex-start;
     }
+    .badges-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 社交中心 */
+.social-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid #f0ece8;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.social-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.social-section {
+    margin-bottom: 2rem;
+}
+
+.social-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+/* 徽章网格 */
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.badge-item {
+    text-align: center;
+    padding: 1rem 0.5rem;
+    border-radius: 10px;
+    border: 1px solid #f0f0f0;
+    transition: transform 0.2s;
+}
+
+.badge-item.unlocked {
+    background: #fff9f0;
+    border-color: #ffd54f;
+}
+
+.badge-item.locked {
+    background: #f8f8f8;
+    opacity: 0.5;
+    filter: grayscale(1);
+}
+
+.badge-item.unlocked:hover {
+    transform: scale(1.05);
+}
+
+.badge-icon {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+}
+
+.badge-name {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.badge-desc {
+    display: block;
+    font-size: 0.7rem;
+    color: #999;
+    margin-top: 0.2rem;
+}
+
+/* 下一个目标 */
+.next-goals {
+    background: #f5f3ff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.next-goals h4 {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+}
+
+.goals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.goal-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+.goal-desc {
+    color: #888;
+}
+
+/* 排行榜 */
+.leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.rank-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 1rem;
+    background: #fafafa;
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+
+.rank-item.rank-me {
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+}
+
+.rank-pos {
+    font-size: 1.2rem;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.rank-avatar {
+    font-size: 1.5rem;
+}
+
+.rank-name {
+    font-weight: 600;
+    flex: 1;
+}
+
+.rank-stats {
+    display: flex;
+    gap: 0.8rem;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* 分享卡片 */
+.share-card {
+    text-align: center;
+}
+
+.share-card-inner {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.share-header {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.share-date {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+
+.share-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.share-stat-val {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.share-stat-lbl {
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.share-badges {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.share-btn {
+    padding: 0.6rem 2rem;
+    background: #9c27b0;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.share-btn:hover {
+    background: #7b1fa2;
 }
 
 @media (max-width: 900px) {

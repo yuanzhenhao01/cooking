@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const pageRecipe = document.getElementById("pageRecipe");
     const pageTimer = document.getElementById("pageTimer");
     const pageReport = document.getElementById("pageReport");
+    const pageSocial = document.getElementById("pageSocial");
     const userForm = document.getElementById("userForm");
 
     // 动态日期显示
@@ -41,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 页面切换
     function showPage(page) {
-        [pageInput, pageResult, pageRecipe, pageTimer, pageReport].forEach(function (p) {
+        [pageInput, pageResult, pageRecipe, pageTimer, pageReport, pageSocial].forEach(function (p) {
             p.classList.remove("active");
         });
         page.classList.add("active");
@@ -305,6 +306,11 @@ document.addEventListener("DOMContentLoaded", function () {
             showReport();
         });
 
+        // 社交中心按钮
+        document.getElementById("showSocialBtn").addEventListener("click", function () {
+            showSocial();
+        });
+
         // AI对话发送
         document.getElementById("chatSendBtn").addEventListener("click", sendChatMessage);
         document.getElementById("chatInput").addEventListener("keyup", function (e) {
@@ -482,7 +488,106 @@ document.addEventListener("DOMContentLoaded", function () {
                             '<button class="timer-btn timer-btn-done" id="timerDone">\u8fd4\u56de\u65b9\u6848</button>';
                         document.getElementById("timerDone").addEventListener("click", function () {
                             showPage(pageResult);
-                        });
+    // ========== 社交中心 ==========
+    function showSocial() {
+        var unlocked = AchievementSystem.getUnlocked();
+        var nextGoals = AchievementSystem.getNextGoals();
+        var ranking = Leaderboard.getRanking();
+        var shareData = ShareCard.generate();
+        var stats = AchievementSystem.getStats();
+
+        var html = '<button class="back-btn" id="backFromSocial">\u2190 \u8fd4\u56de\u65b9\u6848</button>' +
+            '<h2>\ud83c\udf1f \u793e\u4ea4\u4e2d\u5fc3</h2>';
+
+        // 成就徽章
+        html += '<div class="social-section">' +
+            '<h3>\ud83c\udfc5 \u6211\u7684\u6210\u5c31 <span style="font-size:0.85rem;color:#888;">(\u5df2\u89e3\u9501 ' + unlocked.length + '/' + AchievementSystem.badges.length + ')</span></h3>' +
+            '<div class="badges-grid">';
+
+        AchievementSystem.badges.forEach(function (badge) {
+            var isUnlocked = unlocked.some(function (u) { return u.id === badge.id; });
+            html += '<div class="badge-item ' + (isUnlocked ? "unlocked" : "locked") + '">' +
+                '<span class="badge-icon">' + badge.icon + '</span>' +
+                '<span class="badge-name">' + badge.name + '</span>' +
+                '<span class="badge-desc">' + badge.desc + '</span>' +
+                '</div>';
+        });
+
+        html += '</div>';
+
+        // 下一个目标
+        if (nextGoals.length > 0) {
+            html += '<div class="next-goals"><h4>\ud83c\udfaf \u4e0b\u4e00\u4e2a\u76ee\u6807</h4><div class="goals-list">';
+            nextGoals.forEach(function (g) {
+                html += '<div class="goal-item"><span>' + g.icon + ' ' + g.name + '</span><span class="goal-desc">' + g.desc + '</span></div>';
+            });
+            html += '</div></div>';
+        }
+        html += '</div>';
+
+        // 排行榜
+        html += '<div class="social-section">' +
+            '<h3>\ud83c\udfc6 \u6253\u5361\u6392\u884c\u699c</h3>' +
+            '<div class="leaderboard">';
+
+        ranking.forEach(function (user, idx) {
+            var medal = idx === 0 ? "\ud83e\udd47" : idx === 1 ? "\ud83e\udd48" : idx === 2 ? "\ud83e\udd49" : (idx + 1) + "";
+            html += '<div class="rank-item ' + (user.isMe ? "rank-me" : "") + '">' +
+                '<span class="rank-pos">' + medal + '</span>' +
+                '<span class="rank-avatar">' + user.avatar + '</span>' +
+                '<span class="rank-name">' + user.name + '</span>' +
+                '<div class="rank-stats">' +
+                '<span>\ud83d\udd25' + user.streak + '\u5929</span>' +
+                '<span>\ud83c\udf5a' + user.mealRate + '%</span>' +
+                '<span>\ud83c\udfcb\ufe0f' + user.exerciseRate + '%</span>' +
+                '</div>' +
+                '</div>';
+        });
+
+        html += '</div></div>';
+
+        // 分享卡片
+        html += '<div class="social-section">' +
+            '<h3>\ud83d\udcf1 \u5206\u4eab\u6211\u7684\u6210\u7ee9</h3>' +
+            '<div class="share-card">' +
+            '<div class="share-card-inner">' +
+            '<div class="share-header">\u6bcf\u65e5fit \u00b7 \u4eca\u65e5\u6253\u5361</div>' +
+            '<div class="share-date">' + shareData.date + '</div>' +
+            '<div class="share-stats-row">' +
+            '<div class="share-stat"><div class="share-stat-val">\ud83d\udd25 ' + shareData.streak + '</div><div class="share-stat-lbl">\u8fde\u7eed\u5929\u6570</div></div>' +
+            '<div class="share-stat"><div class="share-stat-val">\ud83c\udf5a ' + shareData.mealRate + '%</div><div class="share-stat-lbl">\u996e\u98df</div></div>' +
+            '<div class="share-stat"><div class="share-stat-val">\ud83c\udfcb\ufe0f ' + shareData.exerciseRate + '%</div><div class="share-stat-lbl">\u8fd0\u52a8</div></div>' +
+            '<div class="share-stat"><div class="share-stat-val">' + shareData.weightTrend + '</div><div class="share-stat-lbl">\u4f53\u91cd</div></div>' +
+            '</div>' +
+            '<div class="share-badges">\ud83c\udfc5 ' + shareData.badgeCount + ' \u4e2a\u6210\u5c31 ' + shareData.badges + '</div>' +
+            '</div>' +
+            '<button class="share-btn" id="copyShareBtn">\ud83d\udccb \u590d\u5236\u5206\u4eab\u6587\u6848</button>' +
+            '</div></div>';
+
+        document.getElementById("socialContent").innerHTML = html;
+        showPage(pageSocial);
+
+        // 绑定事件
+        document.getElementById("backFromSocial").addEventListener("click", function () {
+            showPage(pageResult);
+        });
+
+        document.getElementById("copyShareBtn").addEventListener("click", function () {
+            var text = "\u3010\u6bcf\u65e5fit \u6253\u5361\u3011\n" +
+                "\ud83d\udd25 \u8fde\u7eed\u6253\u5361 " + shareData.streak + " \u5929\n" +
+                "\ud83c\udf5a \u996e\u98df\u5b8c\u6210\u7387 " + shareData.mealRate + "%\n" +
+                "\ud83c\udfcb\ufe0f \u8fd0\u52a8\u5b8c\u6210\u7387 " + shareData.exerciseRate + "%\n" +
+                "\ud83c\udfc5 \u5df2\u89e3\u9501 " + shareData.badgeCount + " \u4e2a\u6210\u5c31\n" +
+                "\u4e00\u8d77\u6765\u6bcf\u65e5fit\uff0c\u5403\u5f97\u5bf9\u3001\u7ec3\u5f97\u597d\uff01";
+            navigator.clipboard.writeText(text).then(function () {
+                document.getElementById("copyShareBtn").textContent = "\u2713 \u5df2\u590d\u5236";
+                setTimeout(function () {
+                    document.getElementById("copyShareBtn").textContent = "\ud83d\udccb \u590d\u5236\u5206\u4eab\u6587\u6848";
+                }, 2000);
+            });
+        });
+    }
+});
                     }
                 }, 1000);
             }
