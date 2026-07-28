@@ -234,16 +234,17 @@ header {
 }
 
 .btn-loading {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
 }
 
 .loading-spinner {
+    display: inline-block;
     width: 18px;
     height: 18px;
-    border: 2px solid rgba(255,255,255,0.3);
+    border: 2.5px solid rgba(255,255,255,0.3);
     border-top-color: #fff;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -255,23 +256,35 @@ header {
 
 .loading-text {
     font-size: 0.95rem;
-    transition: opacity 0.3s;
+    animation: fadeSwitch 0.5s ease;
+}
+
+@keyframes fadeSwitch {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
 }
 
 .loading-dots::after {
-    content: '';
-    animation: dots 1.5s steps(3) infinite;
+    content: '...';
+    display: inline-block;
+    width: 1.2em;
+    text-align: left;
+    animation: dotPulse 1.5s infinite;
 }
 
-@keyframes dots {
-    0% { content: ''; }
-    33% { content: '.'; }
-    66% { content: '..'; }
-    100% { content: '...'; }
+@keyframes dotPulse {
+    0% { content: '.'; }
+    33% { content: '..'; }
+    66% { content: '...'; }
+    100% { content: '.'; }
 }
 
 .hidden {
     display: none !important;
+}
+
+span.btn-loading:not(.hidden) {
+    display: inline-flex !important;
 }
 
 /* 结果页 */
