@@ -74,21 +74,50 @@ document.addEventListener("DOMContentLoaded", function () {
         var btnText = document.querySelector(".btn-text");
         var btnLoading = document.querySelector(".btn-loading");
 
-        btnText.classList.add("hidden");
-        btnLoading.classList.remove("hidden");
+        // 保存API Key
+        var apiKeyVal = document.getElementById("apiKeyInput").value.trim();
+        if (apiKeyVal) setApiKey(apiKeyVal);
 
-        // 模拟AI生成延迟
-        setTimeout(function () {
-            btnText.classList.remove("hidden");
-            btnLoading.classList.add("hidden");
-            generatePlan();
-        }, 1500);
+        // 收集用户信息
+        var userInfo = {
+            age: parseInt(document.getElementById("age").value) || 25,
+            height: parseInt(document.getElementById("height").value) || 170,
+            weight: parseInt(document.getElementById("weight").value) || 65,
+            gender: document.getElementById("gender").value,
+            goal: { lose: "减脂瘦身", maintain: "维持体重", gain: "增肌增重", health: "均衡健康" }[currentGoal] || "均衡健康",
+            tastes: Array.from(document.querySelectorAll(".taste-btn.active")).map(function (b) { return b.textContent; }),
+            allergy: document.getElementById("allergy").value,
+            budget: document.getElementById("budget").value,
+            dishCounts: {
+                breakfast: parseInt(document.getElementById("breakfastCount").value) || 2,
+                lunch: parseInt(document.getElementById("lunchCount").value) || 3,
+                dinner: parseInt(document.getElementById("dinnerCount").value) || 3
+            },
+            ingredients: document.getElementById("ingredients").value
+        };
+
+        // 先用本地数据秒出方案
+        generatePlanLocal(userInfo);
+
+        // 后台调用AI优化方案
+        btnText.textContent = "AI优化中...";
+        generateAIPlan(userInfo).then(function (plan) {
+            btnText.textContent = "AI 生成今日健康方案";
+            if (plan && plan.meals) {
+                currentPlan = plan;
+                renderResult();
+                appendChatMsg("ai", "AI已优化你的方案，内容已更新！");
+            }
+        }).catch(function (err) {
+            btnText.textContent = "AI 生成今日健康方案";
+            console.warn("AI优化失败，保持本地方案:", err);
+        });
     });
 
-    // 生成方案
-    function generatePlan() {
-        var age = parseInt(document.getElementById("age").value) || 25;
-        var dishCounts = {
+    // 本地生成方案（即时）
+    function generatePlanLocal(userInfo) {
+        var age = userInfo ? userInfo.age : (parseInt(document.getElementById("age").value) || 25);
+        var dishCounts = userInfo ? userInfo.dishCounts : {
             breakfast: parseInt(document.getElementById("breakfastCount").value) || 2,
             lunch: parseInt(document.getElementById("lunchCount").value) || 3,
             dinner: parseInt(document.getElementById("dinnerCount").value) || 3
@@ -250,6 +279,89 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("feedbackSuccess").classList.remove("hidden");
                 document.getElementById("feedbackText").value = "";
             }
+        });
+
+        // AI对话发送
+        document.getElementById("chatSendBtn").addEventListener("click", sendChatMessage);
+        document.getElementById("chatInput").addEventListener("keyup", function (e) {
+            if (e.key === "Enter") sendChatMessage();
+        });
+
+        // 食材识别按钮
+        document.getElementById("photoBtn").addEventListener("click", handlePhotoIdentify);
+    }
+
+    // 发送对话消息
+    function sendChatMessage() {
+        var input = document.getElementById("chatInput");
+        var msg = input.value.trim();
+        if (!msg) return;
+
+        // 显示用户消息
+        appendChatMsg("user", msg);
+        input.value = "";
+
+        // 显示loading
+        appendChatMsg("ai", "AI思考中...", "loading-msg");
+
+        chatWithAI(msg, currentPlan).then(function (result) {
+            removeChatLoading();
+            if (result.type === "chat") {
+                appendChatMsg("ai", result.message);
+            } else if (result.meals) {
+                // AI返回了新方案
+                currentPlan = result;
+                appendChatMsg("ai", "方案已更新！页面内容已刷新。");
+                renderResult();
+            } else {
+                appendChatMsg("ai", "收到，但我暂时无法处理这个请求，请换个说法试试。");
+            }
+        }).catch(function (err) {
+            removeChatLoading();
+            appendChatMsg("ai", "抱歉，AI暂时无法响应（" + err.message + "），请稍后再试。");
+        });
+    }
+
+    function appendChatMsg(role, text, extraClass) {
+        var container = document.getElementById("chatMessages");
+        var cls = role === "user" ? "user-msg" : "ai-msg";
+        var avatar = role === "user" ? "我" : "AI";
+        var div = document.createElement("div");
+        div.className = "chat-msg " + cls + (extraClass ? " " + extraClass : "");
+        div.innerHTML = '<span class="chat-avatar">' + avatar + '</span><div class="chat-bubble">' + text + '</div>';
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function removeChatLoading() {
+        var loading = document.querySelector(".loading-msg");
+        if (loading) loading.remove();
+    }
+
+    // 食材识别
+    function handlePhotoIdentify() {
+        var input = document.getElementById("photoInput");
+        var desc = input.value.trim();
+        if (!desc) return;
+
+        var btn = document.getElementById("photoBtn");
+        btn.textContent = "AI识别中...";
+        btn.disabled = true;
+
+        identifyIngredients(desc).then(function (result) {
+            btn.textContent = "AI识别并推荐";
+            btn.disabled = false;
+            if (result && result.meals) {
+                currentPlan = result;
+                renderResult();
+                appendChatMsg("ai", "已根据你的食材「" + desc + "」生成了新方案，请查看上方内容！");
+                // 滚动到顶部查看
+                document.querySelector(".result-container").scrollIntoView({ behavior: "smooth" });
+            }
+        }).catch(function (err) {
+            btn.textContent = "AI识别并推荐";
+            btn.disabled = false;
+            appendChatMsg("ai", "食材识别失败：" + err.message);
         });
     }
 

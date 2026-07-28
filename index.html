@@ -115,6 +115,11 @@
                     <textarea id="ingredients" placeholder="例如：鸡蛋、西红柿、米饭、鸡胸肉...&#10;留空则AI自由搭配"></textarea>
                 </div>
 
+                <div class="form-group">
+                    <label>DeepSeek API Key（可选，启用AI个性化）</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-... 留空则使用本地方案">
+                </div>
+
                 <button type="submit" class="submit-btn" id="generateBtn">
                     <span class="btn-text">AI 生成今日健康方案</span>
                     <span class="btn-loading hidden">AI 正在规划中...</span>
@@ -125,41 +130,77 @@
 
     <!-- 页面2：AI生成结果 -->
     <main id="pageResult" class="page">
-        <section class="result-container">
+        <section class="result-container result-layout">
             <div class="result-header">
                 <button class="back-btn" id="backToInput">← 重新定制</button>
                 <h2>今日健康方案</h2>
                 <p class="ai-note">AI 已根据你的身体数据和目标生成个性化饮食+运动方案</p>
             </div>
 
-            <!-- 营养概览 -->
-            <div class="nutrition-overview" id="nutritionOverview"></div>
+            <div class="result-body">
+                <!-- 左侧：方案内容 -->
+                <div class="result-main">
+                    <!-- 营养概览 -->
+                    <div class="nutrition-overview" id="nutritionOverview"></div>
 
-            <!-- 三餐方案 -->
-            <div class="meals-plan" id="mealsPlan"></div>
+                    <!-- 三餐方案 -->
+                    <div class="meals-plan" id="mealsPlan"></div>
 
-            <!-- 运动计划 -->
-            <div class="exercise-section">
-                <h3 class="section-title">今日运动计划</h3>
-                <div id="exercisePlan"></div>
-            </div>
+                    <!-- 运动计划 -->
+                    <div class="exercise-section">
+                        <h3 class="section-title">今日运动计划</h3>
+                        <div id="exercisePlan"></div>
+                    </div>
 
-            <!-- 采购清单 -->
-            <div class="shopping-list-section">
-                <h3 class="section-title">今日采购清单</h3>
-                <div id="shoppingList"></div>
-            </div>
+                    <!-- 采购清单 -->
+                    <div class="shopping-list-section">
+                        <h3 class="section-title">今日采购清单</h3>
+                        <div id="shoppingList"></div>
+                    </div>
 
-            <!-- 饮食打卡 -->
-            <div class="checkin-section">
-                <h3 class="section-title">饮食打卡</h3>
-                <div id="checkinArea"></div>
-            </div>
+                    <!-- 饮食打卡 -->
+                    <div class="checkin-section">
+                        <h3 class="section-title">饮食打卡</h3>
+                        <div id="checkinArea"></div>
+                    </div>
 
-            <!-- 运动打卡 -->
-            <div class="checkin-section">
-                <h3 class="section-title">运动打卡</h3>
-                <div id="exerciseCheckin"></div>
+                    <!-- 运动打卡 -->
+                    <div class="checkin-section">
+                        <h3 class="section-title">运动打卡</h3>
+                        <div id="exerciseCheckin"></div>
+                    </div>
+
+                    <!-- 食材识别 -->
+                    <div class="photo-section">
+                        <h3 class="section-title">拍照识别食材</h3>
+                        <div class="photo-container">
+                            <p class="photo-desc">输入你看到的食材（或拍照后描述），AI会根据现有食材推荐菜谱</p>
+                            <div class="photo-input-area">
+                                <textarea id="photoInput" placeholder="描述你的食材，如：冰箱里有鸡蛋、西红柿、牛肉、面条、青椒..."></textarea>
+                                <button id="photoBtn" class="photo-btn">AI识别并推荐</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：AI对话 -->
+                <div class="result-sidebar">
+                    <div class="chat-section chat-sticky">
+                        <h3 class="section-title">AI对话调整</h3>
+                        <div class="chat-container" id="chatContainer">
+                            <div class="chat-messages" id="chatMessages">
+                                <div class="chat-msg ai-msg">
+                                    <span class="chat-avatar">AI</span>
+                                    <div class="chat-bubble">方案已生成！你可以告诉我想调整的地方，比如"午餐换一道清淡的""加一个核心训练"，我会帮你修改。</div>
+                                </div>
+                            </div>
+                            <div class="chat-input-area">
+                                <input type="text" id="chatInput" placeholder="输入调整需求..." autocomplete="off">
+                                <button id="chatSendBtn" class="chat-send-btn">发送</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -179,6 +220,7 @@
     </footer>
 
     <script src="mockdata.js"></script>
+    <script src="ai.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

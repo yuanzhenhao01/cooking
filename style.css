@@ -67,7 +67,7 @@ header {
 /* 页面切换 */
 .page {
     display: none;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 1.5rem 1rem;
 }
@@ -77,6 +77,11 @@ header {
 }
 
 /* 表单容器 */
+.form-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
 .form-container h2 {
     text-align: center;
     font-size: 1.2rem;
@@ -877,5 +882,197 @@ footer {
     .exercise-item-header {
         flex-direction: column;
         align-items: flex-start;
+    }
+}
+
+/* AI对话区域 */
+.result-layout {
+    max-width: 1200px;
+}
+
+.result-body {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.result-main {
+    min-width: 0;
+}
+
+.result-sidebar {
+    position: relative;
+}
+
+.chat-sticky {
+    position: sticky;
+    top: 1rem;
+}
+
+.chat-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #f0ece8;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    height: 400px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+}
+
+.chat-msg {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+    align-items: flex-start;
+}
+
+.chat-msg.user-msg {
+    flex-direction: row-reverse;
+}
+
+.chat-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.ai-msg .chat-avatar {
+    background: #667eea;
+    color: #fff;
+}
+
+.user-msg .chat-avatar {
+    background: #4caf50;
+    color: #fff;
+}
+
+.chat-bubble {
+    max-width: 75%;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.ai-msg .chat-bubble {
+    background: #f5f3ff;
+    color: #333;
+}
+
+.user-msg .chat-bubble {
+    background: #e8f5e9;
+    color: #333;
+}
+
+.chat-input-area {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.chat-input-area input:focus {
+    border-color: #667eea;
+}
+
+.chat-send-btn {
+    padding: 0.7rem 1.5rem;
+    background: #667eea;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chat-send-btn:hover {
+    background: #5a6fd6;
+}
+
+/* 食材识别区域 */
+.photo-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #f0ece8;
+}
+
+.photo-desc {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 0.8rem;
+}
+
+.photo-input-area textarea {
+    width: 100%;
+    min-height: 70px;
+    padding: 0.7rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    resize: vertical;
+    outline: none;
+    margin-bottom: 0.6rem;
+}
+
+.photo-input-area textarea:focus {
+    border-color: #4caf50;
+}
+
+.photo-btn {
+    padding: 0.6rem 1.5rem;
+    background: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.photo-btn:hover {
+    background: #43a047;
+}
+
+.photo-btn:disabled {
+    background: #bbb;
+    cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+    .result-body {
+        grid-template-columns: 1fr;
+    }
+    .chat-sticky {
+        position: static;
+    }
+    .chat-messages {
+        height: 250px;
     }
 }
