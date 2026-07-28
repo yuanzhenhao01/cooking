@@ -73,6 +73,37 @@
                 </div>
 
                 <div class="form-group">
+                    <label>特殊时期（可选）</label>
+                    <div class="special-options">
+                        <button type="button" class="special-btn" data-special="none">无</button>
+                        <button type="button" class="special-btn" data-special="period">经期</button>
+                        <button type="button" class="special-btn" data-special="pregnant">孕期</button>
+                        <button type="button" class="special-btn" data-special="postpartum">产后恢复</button>
+                        <button type="button" class="special-btn" data-special="surgery">术后恢复</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>家庭模式（可选）</label>
+                    <div class="family-mode">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="familyModeToggle">
+                            <span>为全家人规划饮食</span>
+                        </label>
+                        <div class="family-members hidden" id="familyMembers">
+                            <div class="family-member-inputs" id="familyMemberList">
+                                <div class="family-member-row">
+                                    <input type="text" placeholder="称呼(如:爸爸)" class="fm-name">
+                                    <input type="number" placeholder="年龄" class="fm-age">
+                                    <input type="text" placeholder="特殊需求(可选)" class="fm-note">
+                                </div>
+                            </div>
+                            <button type="button" class="add-member-btn" id="addMemberBtn">+ 添加家庭成员</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label>每日餐饮预算（元）</label>
                     <div class="budget-slider">
                         <input type="range" id="budget" min="20" max="150" value="50" step="10">
@@ -164,6 +195,7 @@
                     <div class="shopping-list-section">
                         <h3 class="section-title">今日采购清单</h3>
                         <div id="shoppingList"></div>
+                        <button class="export-list-btn" id="exportListBtn">📋 一键复制采购清单</button>
                     </div>
 
                     <!-- 饮食打卡 -->

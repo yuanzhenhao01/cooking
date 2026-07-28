@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const budgetDisplay = document.getElementById("budgetDisplay");
 
     let currentGoal = "lose";
+    let currentSpecial = "none";
     let currentPlan = null;
 
     // 页面切换
@@ -70,6 +71,42 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // 特殊时期按钮（单选）
+    document.querySelectorAll(".special-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            document.querySelectorAll(".special-btn").forEach(function (b) { b.classList.remove("active"); });
+            this.classList.add("active");
+            currentSpecial = this.getAttribute("data-special");
+        });
+    });
+
+    // 家庭模式
+    document.getElementById("familyModeToggle").addEventListener("change", function () {
+        document.getElementById("familyMembers").classList.toggle("hidden", !this.checked);
+    });
+
+    document.getElementById("addMemberBtn").addEventListener("click", function () {
+        var row = document.createElement("div");
+        row.className = "family-member-row";
+        row.innerHTML = '<input type="text" placeholder="称呼(如:妈妈)" class="fm-name"><input type="number" placeholder="年龄" class="fm-age"><input type="text" placeholder="特殊需求(可选)" class="fm-note"><button type="button" class="remove-member-btn">\u00d7</button>';
+        document.getElementById("familyMemberList").appendChild(row);
+        row.querySelector(".remove-member-btn").addEventListener("click", function () { row.remove(); });
+    });
+
+    function getFamilyMembers() {
+        if (!document.getElementById("familyModeToggle").checked) return [];
+        var members = [];
+        document.querySelectorAll(".family-member-row").forEach(function (row) {
+            var name = row.querySelector(".fm-name").value.trim();
+            var age = row.querySelector(".fm-age").value.trim();
+            var note = row.querySelector(".fm-note").value.trim();
+            if (name || age) {
+                members.push({ name: name || "家人", age: age || "未知", note: note });
+            }
+        });
+        return members;
+    }
+
     // 表单提交
     userForm.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -90,6 +127,8 @@ document.addEventListener("DOMContentLoaded", function () {
             tastes: Array.from(document.querySelectorAll(".taste-btn.active")).map(function (b) { return b.textContent; }),
             allergy: document.getElementById("allergy").value,
             budget: document.getElementById("budget").value,
+            special: currentSpecial,
+            family: getFamilyMembers(),
             dishCounts: {
                 breakfast: parseInt(document.getElementById("breakfastCount").value) || 2,
                 lunch: parseInt(document.getElementById("lunchCount").value) || 3,
@@ -309,6 +348,23 @@ document.addEventListener("DOMContentLoaded", function () {
         // 社交中心按钮
         document.getElementById("showSocialBtn").addEventListener("click", function () {
             showSocial();
+        });
+
+        // 导出采购清单
+        document.getElementById("exportListBtn").addEventListener("click", function () {
+            var text = "\u3010\u6bcf\u65e5fit \u91c7\u8d2d\u6e05\u5355\u3011\n";
+            Object.keys(currentPlan.shoppingList).forEach(function (cat) {
+                text += "\n\u25b6 " + cat + "\n";
+                currentPlan.shoppingList[cat].forEach(function (item) {
+                    text += "  \u2022 " + item + "\n";
+                });
+            });
+            navigator.clipboard.writeText(text).then(function () {
+                document.getElementById("exportListBtn").textContent = "\u2713 \u5df2\u590d\u5236\u5230\u526a\u8d34\u677f";
+                setTimeout(function () {
+                    document.getElementById("exportListBtn").textContent = "\ud83d\udccb \u4e00\u952e\u590d\u5236\u91c7\u8d2d\u6e05\u5355";
+                }, 2000);
+            });
         });
 
         // AI对话发送
@@ -640,7 +696,14 @@ document.addEventListener("DOMContentLoaded", function () {
             '<div class="recipe-section">' +
             '<h3>做法步骤</h3>' +
             '<ol class="recipe-steps">' +
-            dish.steps.map(function (s) { return '<li>' + s + '</li>'; }).join("") +
+            dish.steps.map(function (s) {
+                // 检测步骤中是否有时间，添加计时器按钮
+                var timeMatch = s.match(/(\d+)\s*分钟/);
+                if (timeMatch) {
+                    return '<li>' + s + ' <button class="step-timer-btn" data-minutes="' + timeMatch[1] + '">\u23f0 ' + timeMatch[1] + '\u5206\u949f</button></li>';
+                }
+                return '<li>' + s + '</li>';
+            }).join("") +
             '</ol>' +
             '</div>' +
             '<div class="recipe-section">' +
@@ -656,6 +719,45 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("backToResult").addEventListener("click", function () {
             showPage(pageResult);
         });
+
+        // 厨房计时器按钮
+        document.querySelectorAll(".step-timer-btn").forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                var minutes = parseInt(this.getAttribute("data-minutes"));
+                startKitchenTimer(minutes, this);
+            });
+        });
+    }
+
+    // 厨房定时器
+    function startKitchenTimer(minutes, btn) {
+        var seconds = minutes * 60;
+        var originalText = btn.textContent;
+        btn.disabled = true;
+        btn.classList.add("timer-active");
+
+        var interval = setInterval(function () {
+            seconds--;
+            var m = Math.floor(seconds / 60);
+            var s = seconds % 60;
+            btn.textContent = "\u23f0 " + m.toString().padStart(2, "0") + ":" + s.toString().padStart(2, "0");
+            if (seconds <= 0) {
+                clearInterval(interval);
+                btn.textContent = "\u2705 \u65f6\u95f4\u5230!";
+                btn.classList.remove("timer-active");
+                btn.classList.add("timer-done");
+                // 提醒
+                if (Notification.permission === "granted") {
+                    new Notification("\u6bcf\u65e5fit \u53a8\u623f\u8ba1\u65f6\u5668", { body: minutes + "\u5206\u949f\u5230\u4e86\uff01" });
+                }
+                setTimeout(function () {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove("timer-done");
+                }, 5000);
+            }
+        }, 1000);
     }
 
     // ========== 健康报告 ==========

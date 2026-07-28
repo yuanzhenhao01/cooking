@@ -155,12 +155,16 @@ async function generateAIPlan(userInfo) {
 - 目标：${userInfo.goal}
 - 口味偏好：${userInfo.tastes.join('、')}
 - 忌口/过敏：${userInfo.allergy || '无'}
+- 特殊时期：${userInfo.special === 'none' ? '无' : userInfo.special === 'period' ? '经期' : userInfo.special === 'pregnant' ? '孕期' : userInfo.special === 'postpartum' ? '产后恢复' : userInfo.special === 'surgery' ? '术后恢复' : '无'}
 - 每日预算：${userInfo.budget}元
 - 每餐菜品数：早餐${userInfo.dishCounts.breakfast}道、午餐${userInfo.dishCounts.lunch}道、晚餐${userInfo.dishCounts.dinner}道
 - 现有食材：${userInfo.ingredients || '无特定食材，自由搭配'}
+- 家庭模式：${userInfo.family && userInfo.family.length > 0 ? '需要为全家人规划，成员：' + userInfo.family.map(m => m.name + '(' + m.age + '岁' + (m.note ? ',' + m.note : '') + ')').join('、') : '仅个人'}
 
 ${aiContext}
-请根据以上信息（包括用户历史数据）生成完整的JSON方案。如果用户执行率低，推荐更简单的菜和更轻松的运动。`;
+请根据以上信息生成完整的JSON方案。
+特殊时期注意事项：经期注重补铁补血、避免寒凉；孕期注重叶酸钙铁、避免生食；产后注重高蛋白恢复；术后注重易消化高蛋白。
+家庭模式下，请在每道菜的tips中注明适合哪些家庭成员，并兼顾所有人的需求。`;
 
     chatHistory = [
         { role: "system", content: SYSTEM_PROMPT },
