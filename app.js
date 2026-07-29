@@ -268,9 +268,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 stopLoadingAnimation();
                 btnTextEl.classList.remove("hidden");
                 btnLoadingEl.classList.add("hidden");
-                if (plan && plan.meals && Array.isArray(plan.meals)) {
-                    if (mode === "diet") {
-                        // 只更新饮食部分，保留现有运动
+                if (mode === "exercise") {
+                    // 运动模式：只需要exercise字段
+                    if (plan && plan.exercise) {
+                        if (!currentPlan || !currentPlan.meals) {
+                            currentPlan = generateMealPlan(currentGoal, userInfo.age, userInfo.dishCounts);
+                        }
+                        currentPlan.exercise = plan.exercise;
+                        renderResult();
+                        showPage(pageResult);
+                    } else {
+                        generatePlanLocal(userInfo, mode);
+                    }
+                } else if (mode === "diet") {
+                    // 饮食模式：需要meals字段
+                    if (plan && plan.meals && Array.isArray(plan.meals)) {
                         currentPlan = currentPlan || {};
                         currentPlan.calories = plan.calories;
                         currentPlan.protein = plan.protein;
@@ -282,19 +294,23 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (!currentPlan.exercise) {
                             currentPlan.exercise = generateExercisePlan(currentGoal, userInfo.age);
                         }
-                    } else if (mode === "exercise" && plan.exercise) {
-                        // 只更新运动部分，保留现有饮食
-                        if (!currentPlan || !currentPlan.meals) {
-                            currentPlan = generateMealPlan(currentGoal, userInfo.age, userInfo.dishCounts);
-                        }
-                        currentPlan.exercise = plan.exercise;
+                        renderResult();
+                        showPage(pageResult);
                     } else {
-                        currentPlan = plan;
+                        generatePlanLocal(userInfo, mode);
                     }
-                    renderResult();
-                    showPage(pageResult);
                 } else {
-                    generatePlanLocal(userInfo, mode);
+                    // 全部模式
+                    if (plan && plan.meals && Array.isArray(plan.meals)) {
+                        currentPlan = plan;
+                        if (!currentPlan.exercise) {
+                            currentPlan.exercise = generateExercisePlan(currentGoal, userInfo.age);
+                        }
+                        renderResult();
+                        showPage(pageResult);
+                    } else {
+                        generatePlanLocal(userInfo, mode);
+                    }
                 }
             }).catch(function (err) {
                 stopLoadingAnimation();
