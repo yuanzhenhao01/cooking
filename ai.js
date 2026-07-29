@@ -80,7 +80,13 @@ const SYSTEM_PROMPT = `你是"每日fit"的AI健康规划助手。你需要根�
 - 根据目标调整热量（减脂1200-1500，维持1800-2000，增肌2200-2500）
 - 运动计划要和饮食目标匹配
 - 食材要常见易买，步骤要详细适合小白
-- 每道菜必须有完整的ingredients、steps、tips`;
+- 每道菜必须有完整的ingredients、steps、tips
+- 运动计划必须专业详细，参考专业健身教练（如抖音谭成义）的教学风格：
+  * 每个动作要有明确的目标肌群说明
+  * 动作描述要包含起始姿势、发力方式、呼吸节奏、常见错误
+  * 根据用户选择的训练部位重点安排对应动作
+  * 组数和次数要根据强度等级调整（低：2-3组×10次，中：3-4组×12次，高：4-5组×15次）
+  * 无器械动作优先，有器械时根据用户器械条件推荐`;
 
 // 对话调整的系统提示词
 const CHAT_SYSTEM_PROMPT = `你是"每日fit"的AI健康规划助手。用户已经有了一份饮食+运动方案，现在想通过对话来微调。
@@ -158,7 +164,7 @@ async function generateAIPlan(userInfo) {
 - 身高：${userInfo.height}cm
 - 体重：${userInfo.weight}kg
 - 性别：${userInfo.gender === 'male' ? '男' : '女'}
-- 目标：${userInfo.goal}
+- 饮食目标：${userInfo.goal}
 - 口味偏好：${userInfo.tastes.join('、')}
 - 忌口/过敏：${userInfo.allergy || '无'}
 - 特殊时期：${userInfo.special === 'none' ? '无' : userInfo.special === 'period' ? '经期' : userInfo.special === 'pregnant' ? '孕期' : userInfo.special === 'postpartum' ? '产后恢复' : userInfo.special === 'surgery' ? '术后恢复' : '无'}
@@ -166,11 +172,17 @@ async function generateAIPlan(userInfo) {
 - 每餐菜品数：早餐${userInfo.dishCounts.breakfast}道、午餐${userInfo.dishCounts.lunch}道、晚餐${userInfo.dishCounts.dinner}道
 - 现有食材：${userInfo.ingredients || '无特定食材，自由搭配'}
 - 家庭模式：${userInfo.family && userInfo.family.length > 0 ? '需要为全家人规划，成员：' + userInfo.family.map(m => m.name + '(' + m.age + '岁' + (m.note ? ',' + m.note : '') + ')').join('、') : '仅个人'}
+- 运动目标部位：${userInfo.exerciseGoal || '全身燃脂'}
+- 训练时长：${userInfo.exerciseDuration || '30'}分钟
+- 训练强度：${userInfo.exerciseIntensity === 'low' ? '低（新手）' : userInfo.exerciseIntensity === 'high' ? '高（进阶）' : '中等'}
+- 器械条件：${userInfo.exerciseEquipment === 'none' ? '无器械（纯徒手）' : userInfo.exerciseEquipment === 'dumbbells' ? '有哑铃' : userInfo.exerciseEquipment === 'gym' ? '健身房全套器械' : '弹力带'}
+- 生成模式：${userInfo.mode === 'diet' ? '仅生成饮食方案' : userInfo.mode === 'exercise' ? '仅生成运动方案' : '同时生成饮食+运动方案'}
 
 ${aiContext}
 请根据以上信息生成完整的JSON方案。
 特殊时期注意事项：经期注重补铁补血、避免寒凉；孕期注重叶酸钙铁、避免生食；产后注重高蛋白恢复；术后注重易消化高蛋白。
-家庭模式下，请在每道菜的tips中注明适合哪些家庭成员，并兼顾所有人的需求。`;
+家庭模式下，请在每道菜的tips中注明适合哪些家庭成员，并兼顾所有人的需求。
+运动方案要求：根据用户选择的训练部位重点编排动作，像专业健身教练一样给出每个动作的详细要领（起始姿势、发力方式、呼吸、常见错误）。`;
 
     chatHistory = [
         { role: "system", content: SYSTEM_PROMPT },

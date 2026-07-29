@@ -120,13 +120,32 @@ document.addEventListener("DOMContentLoaded", function () {
     const budgetDisplay = document.getElementById("budgetDisplay");
 
     let currentGoal = "lose";
+    let currentExGoal = "fullbody";
     let currentSpecial = "none";
     let currentPlan = null;
     let currentMode = "all"; // "diet" | "exercise" | "all"
 
     // 预算滑块
     budgetSlider.addEventListener("input", function () {
-        budgetDisplay.textContent = this.value + "元/天";
+        budgetDisplay.textContent = this.value + "\u5143/\u5929";
+    });
+
+    // 饮食目标按钮
+    document.querySelectorAll(".goal-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            document.querySelectorAll(".goal-btn").forEach(function (b) { b.classList.remove("active"); });
+            this.classList.add("active");
+            currentGoal = this.getAttribute("data-goal");
+        });
+    });
+
+    // 运动目标按钮（单选）
+    document.querySelectorAll(".ex-goal-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            document.querySelectorAll(".ex-goal-btn").forEach(function (b) { b.classList.remove("active"); });
+            this.classList.add("active");
+            currentExGoal = this.getAttribute("data-exgoal");
+        });
     });
 
     // 目标按钮
@@ -221,6 +240,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 dinner: parseInt(document.getElementById("dinnerCount").value) || 3
             },
             ingredients: document.getElementById("ingredients").value,
+            exerciseGoal: { fullbody: "全身燃脂", chest_arm: "胸部+手臂", back_shoulder: "背部+肩膀", leg_hip: "腿部+臀部", core: "核心腹部", functional: "功能性训练", cardio: "纯有氧", stretch: "拉伸放松" }[currentExGoal] || "全身燃脂",
+            exerciseDuration: document.getElementById("exerciseDuration").value,
+            exerciseIntensity: document.getElementById("exerciseIntensity").value,
+            exerciseEquipment: document.getElementById("exerciseEquipment").value,
             mode: mode
         };
 

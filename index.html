@@ -94,6 +94,52 @@
                 </div>
 
                 <div class="form-group">
+                    <label>运动目标</label>
+                    <div class="exercise-goal-options">
+                        <button type="button" class="ex-goal-btn active" data-exgoal="fullbody">全身燃脂</button>
+                        <button type="button" class="ex-goal-btn" data-exgoal="chest_arm">胸部+手臂</button>
+                        <button type="button" class="ex-goal-btn" data-exgoal="back_shoulder">背部+肩膀</button>
+                        <button type="button" class="ex-goal-btn" data-exgoal="leg_hip">腿部+臀部</button>
+                        <button type="button" class="ex-goal-btn" data-exgoal="core">核心腹部</button>
+                        <button type="button" class="ex-goal-btn" data-exgoal="functional">功能性训练</button>
+                        <button type="button" class="ex-goal-btn" data-exgoal="cardio">纯有氧</button>
+                        <button type="button" class="ex-goal-btn" data-exgoal="stretch">拉伸放松</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>运动偏好</label>
+                    <div class="form-row">
+                        <div class="input-item">
+                            <span class="input-label">训练时长</span>
+                            <select id="exerciseDuration">
+                                <option value="15">15分钟</option>
+                                <option value="30" selected>30分钟</option>
+                                <option value="45">45分钟</option>
+                                <option value="60">60分钟</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <span class="input-label">训练强度</span>
+                            <select id="exerciseIntensity">
+                                <option value="low">低（新手友好）</option>
+                                <option value="medium" selected>中（有一定基础）</option>
+                                <option value="high">高（进阶挑战）</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <span class="input-label">器械条件</span>
+                            <select id="exerciseEquipment">
+                                <option value="none" selected>无器械（徒手）</option>
+                                <option value="dumbbells">有哑铃</option>
+                                <option value="gym">健身房</option>
+                                <option value="bands">弹力带</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label>口味偏好</label>
                     <div class="taste-options">
                         <button type="button" class="taste-btn" data-taste="light">清淡</button>
