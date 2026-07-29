@@ -649,15 +649,29 @@ document.addEventListener("DOMContentLoaded", function () {
             if (result.type === "chat") {
                 appendChatMsg("ai", result.message);
             } else if ((result.type === "plan" || result.meals) && Array.isArray(result.meals)) {
-                // AI返回了有效的新方案，先显示回复再更新
+                // AI返回了含饮食的完整方案
                 var reply = result.reply || "\u65b9\u6848\u5df2\u6839\u636e\u4f60\u7684\u8981\u6c42\u66f4\u65b0\uff01";
                 appendChatMsg("ai", reply);
                 currentPlan = result;
                 setTimeout(function () { renderResult(); }, 500);
+            } else if ((result.type === "plan" || result.exercise) && result.exercise && result.exercise.sections) {
+                // AI返回了运动方案（可能没有meals）
+                var reply = result.reply || "\u8fd0\u52a8\u65b9\u6848\u5df2\u66f4\u65b0\uff01";
+                appendChatMsg("ai", reply);
+                if (!currentPlan) currentPlan = {};
+                currentPlan.exercise = result.exercise;
+                if (result.meals && Array.isArray(result.meals)) {
+                    currentPlan.meals = result.meals;
+                    currentPlan.calories = result.calories;
+                    currentPlan.protein = result.protein;
+                    currentPlan.carbs = result.carbs;
+                    currentPlan.fat = result.fat;
+                    currentPlan.shoppingList = result.shoppingList;
+                }
+                setTimeout(function () { renderResult(); }, 500);
             } else if (typeof result === "object" && result.message) {
                 appendChatMsg("ai", result.message);
             } else if (typeof result === "object" && result.reply) {
-                // 有回复但方案格式不完整，只显示回复
                 appendChatMsg("ai", result.reply);
             } else {
                 appendChatMsg("ai", "\u6536\u5230\uff0c\u4f46\u6211\u6682\u65f6\u65e0\u6cd5\u5904\u7406\u8fd9\u4e2a\u8bf7\u6c42\uff0c\u8bf7\u6362\u4e2a\u8bf4\u6cd5\u8bd5\u8bd5\u3002");
