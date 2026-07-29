@@ -38,23 +38,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 初始化：检查登录状态和是否有已保存的方案
+    // 初始化：检查登录状态
     updateUserBar();
-    var savedPage = sessionStorage.getItem("dailyfit_current_page");
-    var savedPlan = sessionStorage.getItem("dailyfit_current_plan");
-    var savedMode = sessionStorage.getItem("dailyfit_current_mode");
-
-    if (savedPlan && savedPage === "result") {
-        try {
-            currentPlan = JSON.parse(savedPlan);
-            currentMode = savedMode || "all";
-            renderResult();
-            showPage(pageResult);
-        } catch (e) {
-            if (AuthSystem.isLoggedIn()) showPage(pageInput);
-            else showPage(pageAuth);
-        }
-    } else if (AuthSystem.isLoggedIn()) {
+    if (AuthSystem.isLoggedIn()) {
         showPage(pageInput);
     } else {
         showPage(pageAuth);
@@ -141,6 +127,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const budgetSlider = document.getElementById("budget");
     const budgetDisplay = document.getElementById("budgetDisplay");
+
+    // 刷新后恢复方案页
+    (function restoreState() {
+        var savedPlan = sessionStorage.getItem("dailyfit_current_plan");
+        var savedPage = sessionStorage.getItem("dailyfit_current_page");
+        var savedMode = sessionStorage.getItem("dailyfit_current_mode");
+        if (savedPlan && savedPage === "result") {
+            try {
+                currentPlan = JSON.parse(savedPlan);
+                currentMode = savedMode || "all";
+                // 延迟执行确保DOM和变量都就绪
+                setTimeout(function () {
+                    renderResult();
+                    showPage(pageResult);
+                }, 50);
+            } catch (e) {}
+        }
+    })();
 
     let currentGoal = "lose";
     let currentExGoal = "fullbody";
