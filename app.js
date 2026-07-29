@@ -38,12 +38,35 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 初始化：检查登录状态
+    // 初始化：检查登录状态和是否有已保存的方案
     updateUserBar();
-    if (AuthSystem.isLoggedIn()) {
+    var savedPage = sessionStorage.getItem("dailyfit_current_page");
+    var savedPlan = sessionStorage.getItem("dailyfit_current_plan");
+    var savedMode = sessionStorage.getItem("dailyfit_current_mode");
+
+    if (savedPlan && savedPage === "result") {
+        try {
+            currentPlan = JSON.parse(savedPlan);
+            currentMode = savedMode || "all";
+            renderResult();
+            showPage(pageResult);
+        } catch (e) {
+            if (AuthSystem.isLoggedIn()) showPage(pageInput);
+            else showPage(pageAuth);
+        }
+    } else if (AuthSystem.isLoggedIn()) {
         showPage(pageInput);
     } else {
         showPage(pageAuth);
+    }
+
+    // 保存当前状态到 sessionStorage
+    function saveState() {
+        if (currentPlan) {
+            sessionStorage.setItem("dailyfit_current_plan", JSON.stringify(currentPlan));
+            sessionStorage.setItem("dailyfit_current_page", "result");
+            sessionStorage.setItem("dailyfit_current_mode", currentMode);
+        }
     }
 
     // 登录/注册 Tab 切换
@@ -395,6 +418,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 渲染结果页
     function renderResult() {
+        // 保存状态，刷新后可恢复
+        saveState();
         // 根据 currentMode 控制显示哪些区块
         var showDiet = (currentMode === "diet" || currentMode === "all");
         var showExercise = (currentMode === "exercise" || currentMode === "all");
@@ -556,6 +581,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // 返回按钮
         document.getElementById("backToInput").addEventListener("click", function () {
+            sessionStorage.removeItem("dailyfit_current_plan");
+            sessionStorage.removeItem("dailyfit_current_page");
+            sessionStorage.removeItem("dailyfit_current_mode");
             showPage(pageInput);
         });
 
