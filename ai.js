@@ -159,7 +159,16 @@ async function generateAIPlan(userInfo) {
     // 获取用户历史数据作为AI参考
     var aiContext = UserData.getAIContext();
 
-    const userMessage = `请为以下用户生成今日饮食+运动方案：
+    var modeInstruction = "";
+    if (userInfo.mode === "diet") {
+        modeInstruction = `
+【重要】当前为仅饮食模式，只需要返回饮食相关字段，不需要返回exercise字段。JSON中只包含：type, calories, protein, carbs, fat, ageNote, meals, shoppingList。这样可以更快返回结果。`;
+    } else if (userInfo.mode === "exercise") {
+        modeInstruction = `
+【重要】当前为仅运动模式，只需要返回运动相关字段，不需要返回meals和shoppingList字段。JSON中只包含：type, exercise。每个动作的desc要详细专业。这样可以更快返回结果。`;
+    }
+
+    const userMessage = `请为以下用户生成${userInfo.mode === 'diet' ? '饮食' : userInfo.mode === 'exercise' ? '运动' : '饮食+运动'}方案：
 - 年龄：${userInfo.age}岁
 - 身高：${userInfo.height}cm
 - 体重：${userInfo.weight}kg
@@ -176,13 +185,9 @@ async function generateAIPlan(userInfo) {
 - 训练时长：${userInfo.exerciseDuration || '30'}分钟
 - 训练强度：${userInfo.exerciseIntensity === 'low' ? '低（新手）' : userInfo.exerciseIntensity === 'high' ? '高（进阶）' : '中等'}
 - 器械条件：${userInfo.exerciseEquipment === 'none' ? '无器械（纯徒手）' : userInfo.exerciseEquipment === 'dumbbells' ? '有哑铃' : userInfo.exerciseEquipment === 'gym' ? '健身房全套器械' : '弹力带'}
-- 生成模式：${userInfo.mode === 'diet' ? '仅生成饮食方案' : userInfo.mode === 'exercise' ? '仅生成运动方案' : '同时生成饮食+运动方案'}
-
+${modeInstruction}
 ${aiContext}
-请根据以上信息生成完整的JSON方案。
-特殊时期注意事项：经期注重补铁补血、避免寒凉；孕期注重叶酸钙铁、避免生食；产后注重高蛋白恢复；术后注重易消化高蛋白。
-家庭模式下，请在每道菜的tips中注明适合哪些家庭成员，并兼顾所有人的需求。
-运动方案要求：根据用户选择的训练部位重点编排动作，像专业健身教练一样给出每个动作的详细要领（起始姿势、发力方式、呼吸、常见错误）。`;
+请直接返回JSON，不要多余文字。${userInfo.mode === 'exercise' ? '运动方案要求：根据训练部位重点编排动作，像专业健身教练一样给出每个动作的详细要领（起始姿势、发力方式、呼吸、常见错误）。' : userInfo.mode === 'diet' ? '特殊时期注意事项：经期补铁补血避寒凉；孕期叶酸钙铁避生食；产后高蛋白；术后易消化。' : '运动方案要求专业详细；饮食注意特殊时期。'}`;
 
     chatHistory = [
         { role: "system", content: SYSTEM_PROMPT },
