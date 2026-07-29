@@ -122,6 +122,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentGoal = "lose";
     let currentSpecial = "none";
     let currentPlan = null;
+    let currentMode = "all"; // "diet" | "exercise" | "all"
 
     // 预算滑块
     budgetSlider.addEventListener("input", function () {
@@ -197,6 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function handleGenerate(mode) {
+        currentMode = mode;
         // 保存API Key
         var apiKeyVal = document.getElementById("apiKeyInput").value.trim();
         if (apiKeyVal) setApiKey(apiKeyVal);
@@ -354,67 +356,97 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 渲染结果页
     function renderResult() {
-        // 营养概览
-        document.getElementById("nutritionOverview").innerHTML =
-            '<div class="nutrition-title">今日营养目标' +
-            '<span style="margin-left:1rem;font-size:0.8rem;font-weight:normal;color:#888;">(' + currentPlan.ageNote + ')</span>' +
-            '</div>' +
-            '<div class="nutrition-grid">' +
-            '<div class="nutrition-item"><div class="value">' + currentPlan.calories + '</div><div class="label">总热量(kcal)</div></div>' +
-            '<div class="nutrition-item"><div class="value">' + currentPlan.protein + 'g</div><div class="label">蛋白质</div></div>' +
-            '<div class="nutrition-item"><div class="value">' + currentPlan.carbs + 'g</div><div class="label">碳水</div></div>' +
-            '<div class="nutrition-item"><div class="value">' + currentPlan.fat + 'g</div><div class="label">脂肪</div></div>' +
-            '</div>';
+        // 根据 currentMode 控制显示哪些区块
+        var showDiet = (currentMode === "diet" || currentMode === "all");
+        var showExercise = (currentMode === "exercise" || currentMode === "all");
+
+        // 营养概览（饮食模式显示）
+        var nutritionEl = document.getElementById("nutritionOverview");
+        if (showDiet && currentPlan.calories) {
+            nutritionEl.innerHTML =
+                '<div class="nutrition-title">\u4eca\u65e5\u8425\u517b\u76ee\u6807' +
+                '<span style="margin-left:1rem;font-size:0.8rem;font-weight:normal;color:#888;">(' + (currentPlan.ageNote || "") + ')</span>' +
+                '</div>' +
+                '<div class="nutrition-grid">' +
+                '<div class="nutrition-item"><div class="value">' + currentPlan.calories + '</div><div class="label">\u603b\u70ed\u91cf(kcal)</div></div>' +
+                '<div class="nutrition-item"><div class="value">' + currentPlan.protein + 'g</div><div class="label">\u86cb\u767d\u8d28</div></div>' +
+                '<div class="nutrition-item"><div class="value">' + currentPlan.carbs + 'g</div><div class="label">\u78b3\u6c34</div></div>' +
+                '<div class="nutrition-item"><div class="value">' + currentPlan.fat + 'g</div><div class="label">\u8102\u80aa</div></div>' +
+                '</div>';
+            nutritionEl.style.display = "";
+        } else {
+            nutritionEl.style.display = showDiet ? "" : "none";
+        }
 
         // 三餐方案
-        var mealsHtml = currentPlan.meals.map(function (meal) {
-            var dishesHtml = meal.dishes.map(function (dish) {
-                return '<div class="dish-item" data-dish-id="' + dish.id + '">' +
-                    '<span class="dish-name">' + dish.emoji + ' ' + dish.name + '</span>' +
-                    '<span class="dish-arrow">' + dish.calories + 'kcal ›</span>' +
+        var mealsPlanEl = document.getElementById("mealsPlan");
+        if (showDiet && currentPlan.meals && Array.isArray(currentPlan.meals)) {
+            var mealsHtml = currentPlan.meals.map(function (meal) {
+                var dishesHtml = meal.dishes.map(function (dish) {
+                    return '<div class="dish-item" data-dish-id="' + dish.id + '">' +
+                        '<span class="dish-name">' + dish.emoji + ' ' + dish.name + '</span>' +
+                        '<span class="dish-arrow">' + dish.calories + 'kcal \u203a</span>' +
+                        '</div>';
+                }).join("");
+                return '<div class="meal-card">' +
+                    '<div class="meal-header">' +
+                    '<h3>' + meal.emoji + ' ' + meal.name + '</h3>' +
+                    '<span class="meal-cal">' + meal.calories + ' kcal</span>' +
+                    '</div>' +
+                    '<div class="meal-dishes">' + dishesHtml + '</div>' +
                     '</div>';
             }).join("");
+            mealsPlanEl.innerHTML = mealsHtml;
+            mealsPlanEl.style.display = "";
+        } else {
+            mealsPlanEl.style.display = showDiet ? "" : "none";
+        }
 
-            return '<div class="meal-card">' +
-                '<div class="meal-header">' +
-                '<h3>' + meal.emoji + ' ' + meal.name + '</h3>' +
-                '<span class="meal-cal">' + meal.calories + ' kcal</span>' +
+        // 运动计划
+        var exerciseSectionEl = document.querySelector(".exercise-section");
+        if (showExercise && currentPlan.exercise) {
+            exerciseSectionEl.style.display = "";
+        } else {
+            exerciseSectionEl.style.display = showExercise ? "" : "none";
+        }
+
+        // 采购清单（饮食模式显示）
+        var shoppingEl = document.querySelector(".shopping-list-section");
+        shoppingEl.style.display = showDiet ? "" : "none";
+        if (showDiet && currentPlan.shoppingList) {
+            var shoppingHtml = Object.keys(currentPlan.shoppingList).map(function (category) {
+                var items = currentPlan.shoppingList[category].map(function (item) {
+                    return '<span class="shopping-item">' + item + '</span>';
+                }).join("");
+                return '<div class="shopping-category">' +
+                    '<h4>' + category + '</h4>' +
+                    '<div class="shopping-items">' + items + '</div>' +
+                    '</div>';
+            }).join("");
+            document.getElementById("shoppingList").innerHTML = shoppingHtml;
+        }
+
+        // 饮食打卡（饮食模式显示）
+        var dietCheckinEls = document.querySelectorAll(".checkin-section");
+        if (dietCheckinEls[0]) dietCheckinEls[0].style.display = showDiet ? "" : "none";
+        if (dietCheckinEls[1]) dietCheckinEls[1].style.display = showExercise ? "" : "none";
+
+        if (showDiet && currentPlan.meals && Array.isArray(currentPlan.meals)) {
+            var checkinHtml = '<div class="checkin-meals">' +
+                currentPlan.meals.map(function (meal) {
+                    return '<div class="checkin-item">' +
+                        '<span class="meal-name">' + meal.emoji + ' ' + meal.name + '</span>' +
+                        '<button class="checkin-btn" data-meal="' + meal.name + '">\u6253\u5361</button>' +
+                        '</div>';
+                }).join("") +
                 '</div>' +
-                '<div class="meal-dishes">' + dishesHtml + '</div>' +
+                '<div class="feedback-area">' +
+                '<textarea id="feedbackText" placeholder="\u4eca\u5929\u7684\u996e\u98df\u611f\u53d7\u5982\u4f55\uff1f\u6709\u4ec0\u4e48\u60f3\u8c03\u6574\u7684\uff1f"></textarea>' +
+                '<button class="feedback-btn" id="feedbackBtn">\u63d0\u4ea4\u53cd\u9988</button>' +
+                '<div class="feedback-success hidden" id="feedbackSuccess">\u53cd\u9988\u5df2\u6536\u5230</div>' +
                 '</div>';
-        }).join("");
-
-        document.getElementById("mealsPlan").innerHTML = mealsHtml;
-
-        // 采购清单
-        var shoppingHtml = Object.keys(currentPlan.shoppingList).map(function (category) {
-            var items = currentPlan.shoppingList[category].map(function (item) {
-                return '<span class="shopping-item">' + item + '</span>';
-            }).join("");
-            return '<div class="shopping-category">' +
-                '<h4>' + category + '</h4>' +
-                '<div class="shopping-items">' + items + '</div>' +
-                '</div>';
-        }).join("");
-
-        document.getElementById("shoppingList").innerHTML = shoppingHtml;
-
-        // 饮食打卡
-        var checkinHtml = '<div class="checkin-meals">' +
-            currentPlan.meals.map(function (meal) {
-                return '<div class="checkin-item">' +
-                    '<span class="meal-name">' + meal.emoji + ' ' + meal.name + '</span>' +
-                    '<button class="checkin-btn" data-meal="' + meal.name + '">打卡</button>' +
-                    '</div>';
-            }).join("") +
-            '</div>' +
-            '<div class="feedback-area">' +
-            '<textarea id="feedbackText" placeholder="今天的饮食感受如何？有什么想调整的？AI会根据你的反馈优化明天的方案..."></textarea>' +
-            '<button class="feedback-btn" id="feedbackBtn">提交反馈</button>' +
-            '<div class="feedback-success hidden" id="feedbackSuccess">反馈已收到，AI将在明日方案中调整</div>' +
-            '</div>';
-
-        document.getElementById("checkinArea").innerHTML = checkinHtml;
+            document.getElementById("checkinArea").innerHTML = checkinHtml;
+        }
 
         // 运动计划
         var ex = currentPlan.exercise;
