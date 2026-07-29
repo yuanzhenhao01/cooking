@@ -188,14 +188,32 @@
                     <input type="password" id="apiKeyInput" placeholder="sk-... 留空则使用本地方案" style="padding:0.9rem 1rem;font-size:1rem;">
                 </div>
 
-                <button type="submit" class="submit-btn" id="generateBtn">
-                    <span class="btn-text">AI 生成今日健康方案</span>
-                    <span class="btn-loading hidden">
-                        <span class="loading-spinner"></span>
-                        <span class="loading-text">AI 正在规划中</span>
-                        <span class="loading-dots"></span>
-                    </span>
-                </button>
+                <div class="generate-btns">
+                    <button type="button" class="submit-btn submit-btn-diet" id="generateDietBtn">
+                        <span class="btn-text-diet">🍽️ 定制饮食方案</span>
+                        <span class="btn-loading-diet hidden">
+                            <span class="loading-spinner"></span>
+                            <span class="loading-text">规划饮食中</span>
+                            <span class="loading-dots"></span>
+                        </span>
+                    </button>
+                    <button type="button" class="submit-btn submit-btn-exercise" id="generateExBtn">
+                        <span class="btn-text-ex">🏋️ 定制运动方案</span>
+                        <span class="btn-loading-ex hidden">
+                            <span class="loading-spinner"></span>
+                            <span class="loading-text">规划运动中</span>
+                            <span class="loading-dots"></span>
+                        </span>
+                    </button>
+                    <button type="submit" class="submit-btn submit-btn-all" id="generateBtn">
+                        <span class="btn-text">✨ 一键生成饮食+运动方案</span>
+                        <span class="btn-loading hidden">
+                            <span class="loading-spinner"></span>
+                            <span class="loading-text">AI 正在规划中</span>
+                            <span class="loading-dots"></span>
+                        </span>
+                    </button>
+                </div>
             </form>
         </section>
     </main>

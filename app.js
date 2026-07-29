@@ -180,12 +180,23 @@ document.addEventListener("DOMContentLoaded", function () {
         return members;
     }
 
-    // 表单提交
+    // 表单提交（一键生成饮食+运动）
     userForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        var btnText = document.querySelector(".btn-text");
-        var btnLoading = document.querySelector(".btn-loading");
+        handleGenerate("all");
+    });
 
+    // 单独生成饮食
+    document.getElementById("generateDietBtn").addEventListener("click", function () {
+        handleGenerate("diet");
+    });
+
+    // 单独生成运动
+    document.getElementById("generateExBtn").addEventListener("click", function () {
+        handleGenerate("exercise");
+    });
+
+    function handleGenerate(mode) {
         // 保存API Key
         var apiKeyVal = document.getElementById("apiKeyInput").value.trim();
         if (apiKeyVal) setApiKey(apiKeyVal);
@@ -207,36 +218,70 @@ document.addEventListener("DOMContentLoaded", function () {
                 lunch: parseInt(document.getElementById("lunchCount").value) || 3,
                 dinner: parseInt(document.getElementById("dinnerCount").value) || 3
             },
-            ingredients: document.getElementById("ingredients").value
+            ingredients: document.getElementById("ingredients").value,
+            mode: mode
         };
 
-        // 如果有API Key，直接用AI生成；否则用本地
+        // 选择对应按钮的loading状态
+        var btnTextEl, btnLoadingEl;
+        if (mode === "diet") {
+            btnTextEl = document.querySelector(".btn-text-diet");
+            btnLoadingEl = document.querySelector(".btn-loading-diet");
+        } else if (mode === "exercise") {
+            btnTextEl = document.querySelector(".btn-text-ex");
+            btnLoadingEl = document.querySelector(".btn-loading-ex");
+        } else {
+            btnTextEl = document.querySelector(".btn-text");
+            btnLoadingEl = document.querySelector(".btn-loading");
+        }
+
         if (getApiKey()) {
-            btnText.classList.add("hidden");
-            btnLoading.classList.remove("hidden");
+            btnTextEl.classList.add("hidden");
+            btnLoadingEl.classList.remove("hidden");
             startLoadingAnimation();
             generateAIPlan(userInfo).then(function (plan) {
                 stopLoadingAnimation();
-                btnText.classList.remove("hidden");
-                btnLoading.classList.add("hidden");
+                btnTextEl.classList.remove("hidden");
+                btnLoadingEl.classList.add("hidden");
                 if (plan && plan.meals && Array.isArray(plan.meals)) {
-                    currentPlan = plan;
+                    if (mode === "diet") {
+                        // 只更新饮食部分，保留现有运动
+                        currentPlan = currentPlan || {};
+                        currentPlan.calories = plan.calories;
+                        currentPlan.protein = plan.protein;
+                        currentPlan.carbs = plan.carbs;
+                        currentPlan.fat = plan.fat;
+                        currentPlan.ageNote = plan.ageNote;
+                        currentPlan.meals = plan.meals;
+                        currentPlan.shoppingList = plan.shoppingList;
+                        if (!currentPlan.exercise) {
+                            currentPlan.exercise = generateExercisePlan(currentGoal, userInfo.age);
+                        }
+                    } else if (mode === "exercise" && plan.exercise) {
+                        // 只更新运动部分，保留现有饮食
+                        if (!currentPlan || !currentPlan.meals) {
+                            currentPlan = generateMealPlan(currentGoal, userInfo.age, userInfo.dishCounts);
+                        }
+                        currentPlan.exercise = plan.exercise;
+                    } else {
+                        currentPlan = plan;
+                    }
                     renderResult();
                     showPage(pageResult);
                 } else {
-                    generatePlanLocal(userInfo);
+                    generatePlanLocal(userInfo, mode);
                 }
             }).catch(function (err) {
                 stopLoadingAnimation();
-                btnText.classList.remove("hidden");
-                btnLoading.classList.add("hidden");
+                btnTextEl.classList.remove("hidden");
+                btnLoadingEl.classList.add("hidden");
                 console.warn("AI生成失败，使用本地方案:", err);
-                generatePlanLocal(userInfo);
+                generatePlanLocal(userInfo, mode);
             });
         } else {
-            generatePlanLocal(userInfo);
+            generatePlanLocal(userInfo, mode);
         }
-    });
+    }
 
     // 加载动画
     var loadingInterval = null;
@@ -272,15 +317,37 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 本地生成方案（即时）
-    function generatePlanLocal(userInfo) {
+    function generatePlanLocal(userInfo, mode) {
         var age = userInfo ? userInfo.age : (parseInt(document.getElementById("age").value) || 25);
         var dishCounts = userInfo ? userInfo.dishCounts : {
             breakfast: parseInt(document.getElementById("breakfastCount").value) || 2,
             lunch: parseInt(document.getElementById("lunchCount").value) || 3,
             dinner: parseInt(document.getElementById("dinnerCount").value) || 3
         };
-        currentPlan = generateMealPlan(currentGoal, age, dishCounts);
-        currentPlan.exercise = generateExercisePlan(currentGoal, age);
+
+        if (mode === "diet") {
+            var mealPlan = generateMealPlan(currentGoal, age, dishCounts);
+            currentPlan = currentPlan || {};
+            currentPlan.calories = mealPlan.calories;
+            currentPlan.protein = mealPlan.protein;
+            currentPlan.carbs = mealPlan.carbs;
+            currentPlan.fat = mealPlan.fat;
+            currentPlan.ageNote = mealPlan.ageNote;
+            currentPlan.meals = mealPlan.meals;
+            currentPlan.shoppingList = mealPlan.shoppingList;
+            if (!currentPlan.exercise) {
+                currentPlan.exercise = generateExercisePlan(currentGoal, age);
+            }
+        } else if (mode === "exercise") {
+            if (!currentPlan || !currentPlan.meals) {
+                currentPlan = generateMealPlan(currentGoal, age, dishCounts);
+            }
+            currentPlan.exercise = generateExercisePlan(currentGoal, age);
+        } else {
+            currentPlan = generateMealPlan(currentGoal, age, dishCounts);
+            currentPlan.exercise = generateExercisePlan(currentGoal, age);
+        }
+
         renderResult();
         showPage(pageResult);
     }
